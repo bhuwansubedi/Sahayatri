@@ -78,8 +78,12 @@ WSGI_APPLICATION = 'sahayatri.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'd64m42gfgc5vq1',
+        'USER': 'yezdhktlnttxxx',
+        'PASSWORD': '890a3553c841c788cdd6bb934b8fcd2be5cbddd6b69d5f36c5534ab11e2aab6d',
+        'HOST': 'ec2-107-22-238-112.compute-1.amazonaws.com',
+        'PORT': '5432',
     }
 }
 
