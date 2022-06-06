@@ -68,12 +68,12 @@
 		<div class="header_top">
 			<div class="container">
                 <div class="row align-items-center">
-                    <div class="col-lg-6 col-md-6 col-sm-8">
+                    <!-- <div class="col-lg-6 col-md-6 col-sm-8">
                         <div class="header_top_left">
                             <p><i class="fas fa-map-marker-alt"></i>20 Main Street, USA </p>                                                                                  
 							<p><i class="far fa-envelope-open"></i> info@example.com</p>
                          </div>
-                    </div>
+                    </div> -->
 
                     <div class="col-lg-6 col-md-6 col-sm-4">
                         <div class="header_top_right text-right">	
@@ -104,10 +104,10 @@
 						<nav id="main-menu" class="ml-auto">
 							<ul>
 								<li><a href="#home">Home</a></li>
-								<li><a href="{% url 'registerMerchant' %}">Register Merchant</a></li>
 								{% if request.user.is_authenticated %}
             						<li><a class="nav-link text-black font-weight-bold" href="{% url 'logout' %}">Logout</a></li>
           						{% else %}
+								  	<li><a href="{% url 'registerMerchant' %}">Register Merchant</a></li>
             						<li><a class="nav-link text-black font-weight-bold" href="{% url 'login' %}">Login</a></li>
           						{% endif %}	
 							</ul>
@@ -217,30 +217,49 @@
 				</div>
 				
 				<div class="row text-left">
-					<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+					<!-- <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
 						<div class="single_about">
 							<i class="ti-check-box about_icon"></i>
 							<h4>W3C Validation</h4>
 							<p>It is a long established fact that a reader will be distracted by the readable content of a page looking .</p>
 						</div>				
-					</div><!--- END COL -->	
+					</div> -->
+					
+					<!--- END COL -->	
 
-					<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+					<!-- <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
 						<div class="single_about active_feature">
 							<i class="ti-rocket about_icon"></i>
 							<h4>Super Fast</h4>
 							<p>It is a long established fact that a reader will be distracted by the readable content of a page looking.</p>
 						</div>				
-					</div><!--- END COL -->
+					</div> -->
+					<!--- END COL -->
 					
-					<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+					<!-- <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
 						<div class="single_about">
 							<i class="ti-light-bulb about_icon"></i>
 							<h4>Latest Bootstrap</h4>
 							<p>It is a long established fact that a reader will be distracted by the readable content of a page looking.</p>
 						</div>				
-					</div><!--- END COL -->	
-					
+					</div> -->
+					<!--- END COL -->	
+					{% for q in query %}
+					<div class="col-lg-4 col-md-6 mb-4">
+						<div class="card h-100">
+						<a href="#"><img class="card-img-top" src="{{ q.image.url }}" alt="" style="height:auto ;width: 100%;"></a>
+						<div class="card-body">
+							<h4 class="card-title">
+							<a>{{ q.name }}</a>
+							</h4>
+							<p class="card-text">{{ q.posted_by }}</p>
+						</div>
+						<div class="card-footer">
+							<small class="text-muted"><h5>Npr. {{ q.price }}</h5></small>
+						</div>
+						</div>
+					</div>
+					{% endfor %}
 								
 				</div><!--- END ROW -->								
 			</div><!--- END CONTAINER -->
