@@ -104,16 +104,12 @@
 						<nav id="main-menu" class="ml-auto">
 							<ul>
 								<li><a href="#home">Home</a></li>
-								<li><a href="#features">Features</a></li>
-								<li><a href="#service">Service</a></li>
-								<li class="menu-item-has-children"><a href="#portfolio">Portfolio</a>
-									<ul class="sub-menu">
-										<li><a href="portfolio-details.html">Portfolio Details</a></li>
-									</ul>
-								</li>
-								<li><a href="#team">Team</a></li>	
-								<li><a href="#blog">Blog</a></li>
-								<li><a class="block-menu" href="#contact">Contact us</a></li>		
+								<li><a href="{% url 'registerMerchant' %}">Register Merchant</a></li>
+								{% if request.user.is_authenticated %}
+            						<li><a class="nav-link text-black font-weight-bold" href="{% url 'logout' %}">Logout</a></li>
+          						{% else %}
+            						<li><a class="nav-link text-black font-weight-bold" href="{% url 'login' %}">Login</a></li>
+          						{% endif %}	
 							</ul>
 						</nav>
 						<div id="mobile_menu"></div>					
@@ -1170,7 +1166,7 @@
 		<!-- END FOOTER -->				
 		 
 		 <!-- STYLE SWITCHER -->
-		 <div id="style-switcher">
+		 <!-- <div id="style-switcher">
 			<h2>Color Palette<a href="#"><i class="fas fa-cog fa-spin"></i></a></h2>
 			<div>
 			  <ul class="colors" id="color1">
@@ -1182,7 +1178,7 @@
 				<li><a href="#" class="style6"></a></li>
 			  </ul>
 			</div>
-		 </div>  
+		 </div>   -->
 		 <!-- END OF STYLE SWITCHER -->	
 		 {%  endfor %}
 		<!-- Latest jQuery -->
