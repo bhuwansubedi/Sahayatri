@@ -3,17 +3,18 @@ from pickle import NONE
 from django.db import models
 from django.http.response import JsonResponse
 from django.shortcuts import render,HttpResponse,redirect
-from sahayatriapp.models import Company
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import CreateUserForm
 from django.contrib import messages
+from sahayatriapp.models import Company,Slider
 
 # Create your views here.
 def index(request):
     cmp=Company.objects.all()
-    context={'cmp':cmp}
+    sld=Slider.objects.all()
+    context={'cmp':cmp,'sld':sld}
     return render(request,'index.html',context)
 
 
@@ -82,3 +83,4 @@ def loginPage(request):
 def logoutUser(request):
 	logout(request)
 	return redirect('index')
+    

@@ -124,16 +124,18 @@
 			<div class="welcome-slider-area">
 				<div id="welcome-slide-carousel" class="carousel slide" data-ride="carousel">
 					<div class="carousel-inner" role="listbox">
+						{% for s in sld %}
 						<div class="carousel-item active">
-							<div class="single-slide-item" style="background-image: url(assets/img/slider/1.jpg);">
+							<div class="single-slide-item" style="background-image:url({{s.sliderimg.url}}); ">
+							<div class="single-slide-item">
 								<div class="single-slide-item-table">
 									<div class="single-slide-item-tablecell">
 										<div class="container">
 											<div class="row align-items-center">
-												<div class="col-lg-12">
-													<span>Welcome To</span>
-													<h2>Jabal Digital Agency Template </h2>
-													<p class="lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam odio nisi, rhoncus non lacus quis, bibendum fringilla risus. Elementum justo viverra sodales</p>
+												<div class="col-lg-12">											
+													<span>{{ s.alttext1 }}</span>
+													<h2>{{ s.alttext2 }}</h2>
+													<p class="lead">{{ s.alttext3 }}</p>
 													<a class="btn-home-border" href="#"><i class="ti-plus"></i> Get Started</a>								
 												</div>
 															
@@ -143,8 +145,8 @@
 								</div>
 							</div>
 						</div>
-						
-						<div class="carousel-item">
+						{% endfor %}
+						<!-- <div class="carousel-item">
 							<div class="single-slide-item" style="background-image: url(assets/img/slider/2.jpg);">
 								<div class="single-slide-item-table">
 									<div class="single-slide-item-tablecell">
@@ -163,9 +165,9 @@
 									</div>
 								</div>
 							</div>
-						</div>
+						</div> -->
 						
-						<div class="carousel-item">
+						<!-- <div class="carousel-item">
 							<div class="single-slide-item" style="background-image: url(assets/img/slider/3.jpg);">
 								<div class="single-slide-item-table">
 									<div class="single-slide-item-tablecell">
@@ -185,7 +187,7 @@
 									</div>
 								</div>
 							</div>
-						</div>
+						</div> -->
 						
 					</div>
 					
