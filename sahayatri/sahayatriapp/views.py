@@ -81,6 +81,11 @@ def loginPage(request):
 		return render(request, 'login.html', context)
 
 
+def prod_detail(request,pk):
+    produc = Product.objects.get(id=pk)
+    context = { 'produc':produc}
+    return render(request,'prod_detail.html',context)
+
 
 def logoutUser(request):
 	logout(request)
@@ -97,7 +102,6 @@ def addPackage(request):
                 user = form.save(commit=False)
                 user.posted_by = request.user
                 user.save()
-                print('save hunu parni ho aba........')
                 return redirect('index')
 
         return render(request,'addPackages.html',{'form': form})
