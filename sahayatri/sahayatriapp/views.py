@@ -6,15 +6,17 @@ from django.shortcuts import render,HttpResponse,redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .forms import CreateUserForm
+from .forms import CreateUserForm,AddPackageForm
 from django.contrib import messages
 from sahayatriapp.models import Company,Slider
+from sahayatriapp.models import Product
 
 # Create your views here.
 def index(request):
+    query = Product.objects.all()
     cmp=Company.objects.all()
     sld=Slider.objects.all()
-    context={'cmp':cmp,'sld':sld}
+    context={'query':query,'cmp':cmp,'sld':sld}
     return render(request,'index.html',context)
 
 
@@ -79,8 +81,30 @@ def loginPage(request):
 		return render(request, 'login.html', context)
 
 
+def prod_detail(request,pk):
+    produc = Product.objects.get(id=pk)
+    context = { 'produc':produc}
+    return render(request,'prod_detail.html',context)
+
 
 def logoutUser(request):
 	logout(request)
 	return redirect('index')
     
+
+def addPackage(request):
+    form = AddPackageForm()
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            form = AddPackageForm(request.POST,request.FILES)
+            
+            if form.is_valid():
+                user = form.save(commit=False)
+                user.posted_by = request.user
+                user.save()
+                return redirect('index')
+
+        return render(request,'addPackages.html',{'form': form})
+             
+    else:
+        return redirect('/login')
