@@ -1,0 +1,166 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!-- Meta -->
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1"> 
+		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+		<!-- SITE TITLE -->			
+		<!-- Latest Bootstrap min CSS -->
+		<link rel="stylesheet" href="{% static 'assets/bootstrap/css/bootstrap.min.css' %}">		
+		<!-- Google Font -->
+		<link rel="preconnect" href="https://fonts.gstatic.com">
+		<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet"> 
+		<!-- Font Awesome CSS -->
+		<link rel="stylesheet" href="{% static 'assets/css/all.css' %}">
+		<!-- themify-icons CSS -->
+		<link rel="stylesheet" href="{% static 'assets/fonts/themify-icons.css' %}">
+		<!-- line-icons CSS -->
+		<link rel="stylesheet" href="{% static 'assets/fonts/line-icons.css' %}">
+		<!--- owl carousel Css-->
+		<link rel="stylesheet" href="{% static 'assets/owlcarousel/css/owl.carousel.css' %}">
+		<link rel="stylesheet" href="{% static 'assets/owlcarousel/css/owl.theme.css' %}">				
+		<!-- venobox CSS -->		
+		<link rel="stylesheet" href="{% static 'assets/css/venobox.css' %}">				
+		<!-- animate CSS -->		
+		<link rel="stylesheet" href="{% static 'assets/css/animate.css' %}">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" integrity="sha512-vKMx8UnXk60zUwyUnUPM3HbQo8QfmNx7+ltw8Pm5zLusl1XIfwcxo8DbWCqMGKaWeNxWA8yrx5v3SaVpMvR3CA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" integrity="sha512-vKMx8UnXk60zUwyUnUPM3HbQo8QfmNx7+ltw8Pm5zLusl1XIfwcxo8DbWCqMGKaWeNxWA8yrx5v3SaVpMvR3CA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+		<!-- MAGNIFIC CSS -->
+		<link rel="stylesheet" href="{% static 'assets/css/magnific-popup.css' %}">		
+		<!-- slicknav CSS -->		
+		<link rel="stylesheet" href="{% static 'assets/css/slicknav.css' %}">
+		<!-- slick CSS -->			
+		<link rel="stylesheet" href="{% static 'assets/css/slick.css' %}">	
+		<!-- slick-theme CSS -->			
+		<link rel="stylesheet" href="{% static 'assets/css/slick-theme.css' %}">		
+		<!-- Style CSS -->		
+		<link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+		<!-- responsive CSS -->		
+		<link rel="stylesheet" href="{% static 'assets/css/responsive.css' %}">
+		<!-- switcher CSS -->			
+		<link rel="stylesheet" href="{% static 'assets/css/switcher/switcher.css' %}"> 	
+		<link rel="stylesheet" href="{% static 'assets/css/switcher/style1.css' %}" id="colors">	
+		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+	</head>
+	
+    <body data-spy="scroll" data-offset="80">
+
+		<!-- START PRELOADER -->
+		<div class="preloader">
+			<div class="status">
+				<div class="status-mes"></div>
+			</div>
+		</div>
+		 <!--  END PRELOADER -->
+		
+		<div class="header_top">
+			<div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 col-md-6 col-sm-8">
+                        <div class="header_top_left">
+                            <p><i class="fas fa-map-marker-alt"></i>Sahayatri - Your Travel Guide </p>
+                         </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-4">
+                        <div class="header_top_right text-right">	
+							<ul class="header-social">
+								<li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+								<li><a href="#"><i class="fab fa-twitter"></i></a></li>
+								<li><a href="#"><i class="fab fa-dribbble"></i></a></li>
+								<li><a href="#"><i class="fab fa-youtube"></i></a></li>
+							</ul>	
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+		<!-- End Top Header -->
+		
+			
+        <center>
+            <form style="margin-top: 20px;" action="" method="post" enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                {% if request.user.is_authenticated %}
+                <h1>Add New Packages.</h1>
+
+                <div class="form-group">
+                <label for="name">{{form.name.label}}</label>
+                {{form.name}}
+                </div>
+                <div class="form-group">
+                    <label for="price">{{form.price.label}}</label>
+                    {{form.price}}
+                </div>
+                <div class="form-group">
+                    <label for="image">{{form.image.label}}</label>
+                    {{form.image}}
+                </div>
+                <div class="form-group">
+                <label for="category">{{form.category.label}}</label>
+                {{form.category}}
+                </div>
+                <div class="form-group">
+                <label for="description">{{form.description.label}}</label>
+                {{form.description}}
+                </div>
+                <input type="submit" value="Add Product" class="btn btn-secondary">
+                {% else %}
+                <div class="form-group">
+                    <label>Please Log in as a merchant to add Packages. Thank You.</label>
+                </div>
+                {% endif %}
+            </form>
+        </center>
+
+        
+		<!-- Latest jQuery -->
+		<script src="{% static 'assets/js/jquery-1.12.4.min.js' %}"></script>
+		<!-- Latest compiled and minified Bootstrap -->
+		<script src="{% static 'assets/bootstrap/js/bootstrap.min.js' %}"></script>
+		<!-- modernizr JS -->		
+		<script src="{% static 'assets/js/modernizr-2.8.3.min.js' %}"></script>
+		<!-- jquery.nav JS -->			
+		<script src="{% static 'assets/js/jquery.nav.js' %}"></script>	
+		<!-- slicknav JS -->			
+		<script src="{% static 'assets/js/jquery.slicknav.js' %}"></script>			
+		<!-- stellar js -->
+		<script src="{% static 'assets/js/jquery.stellar.min.js' %}"></script>		
+		<!-- countTo js -->
+		<script src="{% static 'assets/js/jquery.inview.min.js' %}"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+		<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>-->				
+		<!-- owl-carousel min js  -->
+		<script src="{% static 'assets/owlcarousel/js/owl.carousel.min.js' %}"></script>		
+		<!-- jquery mixitup min js -->
+		<script src="{% static 'assets/js/jquery.mixitup.js' %}"></script>		
+		<!-- jquery venobox min js -->
+		<script src="{% static 'assets/js/venobox.min.js' %}"></script>		
+		<!-- scrolltopcontrol js -->
+		<script src="{% static 'assets/js/scrolltopcontrol.js' %}"></script>
+		<!-- MAGNIFICANT JS -->
+		<script src="{% static 'assets/js/jquery.magnific-popup.min.js' %}"></script>				
+		<!-- jquery appear js -->			
+		<script src="{% static 'assets/js/jquery.appear.js' %}"></script>	
+		<!-- slick js -->		
+		<script src="{% static 'assets/js/slick.js' %}"></script>			
+		<!-- WOW - Reveal Animations When You Scroll -->
+		<script src="{% static 'assets/js/wow.min.js' %}"></script>	
+		<!-- switcher js -->				
+		<script src="{% static 'assets/js/switcher.js' %}"></script>					
+		<!-- scripts js -->
+		<script src="{% static 'assets/js/scripts.js' %}"></script>
+    </body>
+</html>
