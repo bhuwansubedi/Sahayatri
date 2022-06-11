@@ -90,6 +90,9 @@ def prod_detail(request,pk):
 def logoutUser(request):
 	logout(request)
 	return redirect('index')
+
+def dashboard(request):
+    return render(request,'admin.html')
     
 
 def addPackage(request):
