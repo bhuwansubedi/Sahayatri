@@ -1,4 +1,4 @@
-console.log('JS is ACTIVE!');
+console.log('Add package JS is ACTIVE!');
 
 function SubmitButtonClick(){
     console.log('Submit Button clicked.');
