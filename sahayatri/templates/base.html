@@ -1,0 +1,191 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+{% for cmp in cmp %}
+	<head>
+		<!-- Meta -->
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1"> 
+		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+		<!-- SITE TITLE -->
+		<title>{{ cmp.name }} - Your Travel Partner!</title>			
+		<!-- Latest Bootstrap min CSS -->
+		<link rel="stylesheet" href="{% static 'assets/bootstrap/css/bootstrap.min.css' %}">		
+		<!-- Google Font -->
+		<link rel="preconnect" href="https://fonts.gstatic.com">
+		<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet"> 
+		<!-- Font Awesome CSS -->
+		<link rel="stylesheet" href="{% static 'assets/css/all.css' %}">
+		<!-- themify-icons CSS -->
+		<link rel="stylesheet" href="{% static 'assets/fonts/themify-icons.css' %}">
+		<!-- line-icons CSS -->
+		<link rel="stylesheet" href="{% static 'assets/fonts/line-icons.css' %}">
+		<!--- owl carousel Css-->
+		<link rel="stylesheet" href="{% static 'assets/owlcarousel/css/owl.carousel.css' %}">
+		<link rel="stylesheet" href="{% static 'assets/owlcarousel/css/owl.theme.css' %}">				
+		<!-- venobox CSS -->		
+		<link rel="stylesheet" href="{% static 'assets/css/venobox.css' %}">				
+		<!-- animate CSS -->		
+		<link rel="stylesheet" href="{% static 'assets/css/animate.css' %}">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" integrity="sha512-vKMx8UnXk60zUwyUnUPM3HbQo8QfmNx7+ltw8Pm5zLusl1XIfwcxo8DbWCqMGKaWeNxWA8yrx5v3SaVpMvR3CA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" integrity="sha512-vKMx8UnXk60zUwyUnUPM3HbQo8QfmNx7+ltw8Pm5zLusl1XIfwcxo8DbWCqMGKaWeNxWA8yrx5v3SaVpMvR3CA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+		<!-- MAGNIFIC CSS -->
+		<link rel="stylesheet" href="{% static 'assets/css/magnific-popup.css' %}">		
+		<!-- slicknav CSS -->		
+		<link rel="stylesheet" href="{% static 'assets/css/slicknav.css' %}">
+		<!-- slick CSS -->			
+		<link rel="stylesheet" href="{% static 'assets/css/slick.css' %}">	
+		<!-- slick-theme CSS -->			
+		<link rel="stylesheet" href="{% static 'assets/css/slick-theme.css' %}">		
+		<!-- Style CSS -->		
+		<link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+		<!-- responsive CSS -->		
+		<link rel="stylesheet" href="{% static 'assets/css/responsive.css' %}">
+		<!-- switcher CSS -->			
+		<link rel="stylesheet" href="{% static 'assets/css/switcher/switcher.css' %}"> 	
+		<link rel="stylesheet" href="{% static 'assets/css/switcher/style1.css' %}" id="colors">	
+		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+
+        <script src="/static/js/sahayatriJS/base.js"></script>
+
+	</head>
+    <body data-spy="scroll" data-offset="80">
+
+        {% block body %}
+
+        {% endblock body %}
+
+
+        <footer class="footer">
+			<div class="container">
+			    <div class="row footer_br">
+                	<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+						<div class="single-footer">
+							<div class="footer_logo">        
+								<a href="index.html"><img src="{{ cmp.logo.url  }}" alt="logo"></a>
+							</div>		
+							<p>	
+								Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum posuere ante ut gravida pellentesque.
+							</p>
+							<div class="footer_social">
+								<ul>
+									<li><a href="#" class="ti-facebook f_facebook"></a></li>
+									<li><a href="#" class="ti-twitter f_twitter"></a></li>
+									<li><a href="#" class="ti-dribbble f_dribbble"></a></li>
+									<li><a href="#" class="ti-youtube f_youtube"></a></li>
+								</ul>					
+							</div> 	
+						</div>
+					</div>
+					
+					<div class="col-lg-8 col-md-6 col-sm-12 col-xs-12">
+						<div class="row">
+							<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
+								<div class="single-footer">
+									<h3 class="foot-title">Company</h3>
+									<div class="footer_menu">
+										<ul>
+											<li><a href="#">About Us</a></li>										
+											<li><a href="#">Contact Us</a></li>														
+											<li><a href="#">Products</a></li>
+											<li><a href="#">Blog</a></li>
+											<li><a href="#">FAQS</a></li>
+										</ul>					
+									</div> 
+								</div>
+							</div>			
+
+							<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
+								<div class="single-footer">
+									<h3 class="foot-title">Resources</h3>
+									<div class="footer_menu">
+										<ul>
+											<li><a href="#">Help Center</a></li>	
+											<li><a href="#">Download</a></li>
+											<li><a href="#">Events</a></li>														
+											<li><a href="#">Partner</a></li>
+											<li><a href="#">Guides</a></li>
+					
+										</ul>					
+									</div>
+								</div>								
+							</div>			
+
+							<div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+								<div class="single-footer">
+									<h3 class="foot-title">Newsletter</h3>
+									<p>
+										Lorem ipsum dolor sit amet, consectetur adipiscing elit
+									</p>
+									<form id="mailchimp-form" class="mc4wp-form" method="post">
+										<div class="form-group">
+											<input name="EMAIL" class="form-control" id="mce-email" placeholder="Enter Email" type="email" required="">
+											<button type="submit" name="subscribe"><i class="fas fa-paper-plane"></i></button>
+										</div>
+									</form>
+								</div>
+							</div>									
+						</div>
+					</div>
+									
+				</div>	
+				
+				<div class="row">
+					<div class="col-sm-12 text-center wow zoomIn">
+						<div class="footer_content">
+							<p>Copyright © 2021. All Rights Reserved.</p>
+						</div>												
+					</div><!--- END COL -->
+				</div><!--- END ROW -->
+			</div><!--- END CONTAINER -->	
+		</footer>
+		<!-- END FOOTER -->
+        {% endfor %}
+
+        <!-- Latest jQuery -->
+        <script src="{% static 'assets/js/jquery-1.12.4.min.js' %}"></script>
+        <!-- Latest compiled and minified Bootstrap -->
+        <script src="{% static 'assets/bootstrap/js/bootstrap.min.js' %}"></script>
+        <!-- modernizr JS -->		
+        <script src="{% static 'assets/js/modernizr-2.8.3.min.js' %}"></script>
+        <!-- jquery.nav JS -->			
+        <script src="{% static 'assets/js/jquery.nav.js' %}"></script>	
+        <!-- slicknav JS -->			
+        <script src="{% static 'assets/js/jquery.slicknav.js' %}"></script>			
+        <!-- stellar js -->
+        <script src="{% static 'assets/js/jquery.stellar.min.js' %}"></script>		
+        <!-- countTo js -->
+        <script src="{% static 'assets/js/jquery.inview.min.js' %}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>-->				
+        <!-- owl-carousel min js  -->
+        <script src="{% static 'assets/owlcarousel/js/owl.carousel.min.js' %}"></script>		
+        <!-- jquery mixitup min js -->
+        <script src="{% static 'assets/js/jquery.mixitup.js' %}"></script>		
+        <!-- jquery venobox min js -->
+        <script src="{% static 'assets/js/venobox.min.js' %}"></script>		
+        <!-- scrolltopcontrol js -->
+        <script src="{% static 'assets/js/scrolltopcontrol.js' %}"></script>
+        <!-- MAGNIFICANT JS -->
+        <script src="{% static 'assets/js/jquery.magnific-popup.min.js' %}"></script>				
+        <!-- jquery appear js -->			
+        <script src="{% static 'assets/js/jquery.appear.js' %}"></script>	
+        <!-- slick js -->		
+        <script src="{% static 'assets/js/slick.js' %}"></script>			
+        <!-- WOW - Reveal Animations When You Scroll -->
+        <script src="{% static 'assets/js/wow.min.js' %}"></script>	
+        <!-- switcher js -->				
+        <script src="{% static 'assets/js/switcher.js' %}"></script>					
+        <!-- scripts js -->
+        <script src="{% static 'assets/js/scripts.js' %}"></script>
+    </body>
+</html>
