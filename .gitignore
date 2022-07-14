@@ -1,2 +1,4 @@
-/0016_alter_imagecollection_image1_and_more.py
+modified:   sahayatri/sahayatriapp/__pycache__/models.cpython-310.pyc
+modified:   sahayatri/sahayatriapp/__pycache__/views.cpython-310.pyc
+sahayatri/sahayatriapp/migrations/0016_alter_imagecollection_image1_and_more.py
 *.pyc

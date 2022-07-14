@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import AddCategoryForm1, CreateUserForm,AddPackageForm
 from django.contrib import messages
-from sahayatriapp.models import Company,Slider
+from sahayatriapp.models import BudgetCategory, Company,Slider
 from sahayatriapp.models import Product
 
 # Create your views here.
@@ -125,16 +125,12 @@ def category1(request):
 
 def category2(request):
     return render(request,'category2.html')
-def insertcategory(request):
-    catform=AddCategoryForm1()
-    if request.method=='POST':
-        catform.name=request.POST['catname']
-        catform.startPrice=request.POST['startprice']
-        catform.endPrice=request.POST['endprice']
-        catform.status=request.POST['status']        
-        if catform.is_valid:
-            print('Test Object:',catform.cleaned_data)
-            name = catform.cleaned_data['name']
-            catform.save()                               
-            return JsonResponse({'res':'Success'})
+def insertcategory(request):    
+    if request.method=='POST':        
+        name=request.POST['catname']
+        startPrice=request.POST['startprice']
+        endPrice=request.POST['endprice']
+        status=request.POST['status'] 
+        cat=BudgetCategory.objects.create(name=name,startPrice=startPrice,endPrice=endPrice,status=status)                           
+        return JsonResponse({'res':'Success'})
     return redirect('category1')

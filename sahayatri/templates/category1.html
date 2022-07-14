@@ -154,14 +154,14 @@ $('#endprice').keydown(function(e){
         var catname=$('#catname').val();
         var startprice=$('#startprice').val();
         var endprice=$('#endprice').val();
-        var check=$('#status').is(':checked');
-        let status=0;
-        if(check==1||true){
-             status=1;
+        var status=$('#status').is(':checked');
+        if (status==true){
+            status='True';
         }
         else{
-            satats=1;
+            status='False';
         }
+
         if(catname==''||catname==null){
             toastr.error("Category Name Cannot Be Null!",options);
             return fales;
