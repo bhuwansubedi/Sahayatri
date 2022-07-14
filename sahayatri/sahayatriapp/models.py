@@ -140,9 +140,9 @@ class TypeCategory(models.Model):
 class ImageCollection(models.Model):
     product=models.ForeignKey(Product,related_name='img',on_delete=models.CASCADE,null=True)
     author=models.ForeignKey(Merchant,on_delete=models.CASCADE,null=True)
-    image1=models.ImageField(upload_to="static/img/")
-    image2=models.ImageField(upload_to="static/img/")
-    image3=models.ImageField(upload_to="static/img/")
-    image4=models.ImageField(upload_to="static/img/")
+    image1=models.ImageField(upload_to='media')
+    image2=models.ImageField(upload_to='media')
+    image3=models.ImageField(upload_to='media')
+    image4=models.ImageField(upload_to='media')
     
 
