@@ -1,0 +1,201 @@
+{% extends "base1.html" %}
+
+{% block content %}
+<style>
+    .btn-primary {
+    color: #fff;
+    background-color: #4e73df;
+    border-color: #4e73df;
+    width: 100px;
+    margin-left: 10px;
+}
+    .card-body {
+    flex: 1 1 auto;
+    min-height: 1px;
+    padding: 1.25rem;
+    margin-top: -335px;
+}
+    .catform{
+        display: block;
+    align-content: center;
+    margin-left: 250px;
+    margin-top: 15px;
+    }
+    .checkbox{
+        margin-left: 10px;
+    margin-right: 10px;
+    }
+    .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -5px;
+    margin-left: -154px;
+}
+    .catformlabel{
+        display: inline-flex;
+        color: #4e73df; 
+        flex-wrap: nowrap;
+    align-content: space-around;
+    justify-content: flex-start;
+    align-items: baseline;      
+    }
+    .catformlabel1{
+        width: -webkit-fill-available;
+    }
+</style>
+<div class="row text-center">
+    <form class="catform" method="post">
+        {% csrf_token %}
+        <div class="form-row align-items-center">
+          <div class="catformlabel">
+            <label class="catformlabel1">Category Name</label>
+            <input type="text" class="form-control" id="catname"  placeholder="Elite/Luxury/Moderate">
+          </div>
+          <div class="catformlabel">
+            <label class="catformlabel1" >Start Price</label>                          
+              <input type="number" class="form-control" id="startprice" placeholder="Rs. 1000">          
+          </div>
+          <div class="catformlabel">
+            <label class="catformlabel1" >End Price</label>                          
+            <input type="number" class="form-control" id="endprice" placeholder="Rs. 2000">          
+          </div>          
+            <div class="catformlabel" >
+              <input class="checkbox" type="checkbox" id="status">
+              <label class="catformlabel1" for="autoSizingCheck">
+                Status
+              </label>
+            </div>          
+          <div class="col-auto">
+            <button type="button" onclick="SaveCategory();" id="btnSave" class="btn btn-primary mb-2">Save</button>
+          </div>
+        </div>
+      </form>
+      <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Category Name</th>
+                        <th>Start Price</th>
+                        <th>End Price</th>
+                        <th>Status</th>                        
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    <tr>
+                        <td>Tiger Nixon</td>
+                        <td>System Architect</td>
+                        <td>Edinburgh</td>
+                        <td>61</td>
+                        <td>2011/04/25</td>                        
+                    </tr>                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+<script>
+    var options = {
+   "closeButton": true,
+//   "debug": false,
+//   "newestOnTop": false,
+   //"progressBar": true,
+  "positionClass": "toast-bottom-right",
+//   "preventDuplicates": false
+   "showDuration": "300",
+  "hideDuration": "1000",
+  "timeOut": "2000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+}
+$(document).ready(function(){
+    $('#catname').focus();
+
+});
+$('#catname').keydown(function(e){
+    if(e.keyCode==13){
+        if( $('#catname').val()==""|| $('#catname').val()==null){            
+        toastr.error("Cannot leave null field","Error",options);
+        return false;        
+        }
+        $('#startprice').focus();
+    }
+    
+});
+$('#startprice').keydown(function(e){
+    if(e.keyCode==13){
+        if( $('#startprice').val()==""|| $('#startprice').val()==null){
+        toastr.error("Cannot leave null field","Error",options);
+        return false;        
+        }
+        $('#endprice').focus();
+    }
+    
+});
+$('#endprice').keydown(function(e){
+    if(e.keyCode==13){
+        if( $('#endprice').val()==""|| $('#endprice').val()==null){
+        toastr.error("Cannot leave null field","Error");
+        return false;        
+        }
+        toastr.warning("Make Sure to Check Status!","Warning",options);
+        // $('#btnSave').focus();
+    }
+    
+});
+    function SaveCategory(){
+        debugger;
+        var catname=$('#catname').val();
+        var startprice=$('#startprice').val();
+        var endprice=$('#endprice').val();
+        var check=$('#status').is(':checked');
+        let status=0;
+        if(check==1||true){
+             status=1;
+        }
+        else{
+            satats=1;
+        }
+        if(catname==''||catname==null){
+            toastr.error("Category Name Cannot Be Null!",options);
+            return fales;
+        }
+       else if(startprice==''||startprice==null){
+            toastr.error("Start Price Cannot Be Zero!",options);
+            return fales;
+        }
+        else if(endprice==''||endprice==null){
+            toastr.error("End Price Cannot Be Zero!",options);
+            return fales;
+        }else{
+            $.ajax({
+                url:"{% url 'insertcategory' %}",
+                type:"POST",
+                dataType:"json",
+                data:{
+                    catname:catname,startprice:startprice,endprice:endprice,status:status
+                },
+                headers: {
+                  "X-CSRFToken": "{{csrf_token}}"
+                },
+                success:function(res){
+                    debugger;
+                    toastr.success("Category Added Successfully!","Success",options);
+                },
+                error:function(){
+                    toastr.error("Unable to insert","Error",options);
+                }
+            });
+        }
+        
+    }
+
+</script>
+
+{% endblock content %}

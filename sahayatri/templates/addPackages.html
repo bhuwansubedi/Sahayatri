@@ -36,7 +36,7 @@
 	<!-- End Top Header -->
 	
 		
-	<center>
+	<!-- <center>
 		<form style="margin-top: 20px;" action="" method="post" enctype="multipart/form-data">
 
 			{% csrf_token %}
@@ -71,7 +71,89 @@
 			</div>
 			{% endif %}
 		</form>
-	</center>
+	</center> -->
+	<form style="margin-top: 20px;" action="" method="post" enctype="multipart/form-data">
+	<div class="container register">
+		<div class="row">
+			<div class="col-md-3 register-left">
+				<img src="https://image.ibb.co/n7oTvU/logo_white.png" alt=""/>
+				<h3>Welcome</h3>
+				<p>You are 30 seconds away from earning your own money!</p>
+				<input type="submit" name="" value="Login"/><br/>
+			</div>
+			<div class="col-md-9 register-right">
+				<ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+					<li class="nav-item">
+						<a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Employee</a>
+					</li>					
+				</ul>
+				<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+						<h3 class="register-heading">Add Package</h3>
+						<div class="row register-form">
+							<div class="col-md-6">
+								<div class="form-group">
+									<input type="text" class="form-control" id="pname" placeholder="Package Name" value="" />
+								</div>
+								<div class="form-group">
+									<input type="number" class="form-control" id="price" placeholder="Price" value="" />
+								</div>								
+								<div class="form-group">
+									<input type="text" class="form-control" id="desc" placeholder="Description" value="" />
+								</div>
+								<div class="form-group">
+									<input type="text" class="form-control" id="duration" placeholder="Duration" value="" />
+								</div>
+								<div class="form-group">
+									<input type="text" class="form-control" id="itner" placeholder="Itnerary" value="" />
+								</div>
+								<div class="form-group">
+									<input type="password" class="form-control"  placeholder="Confirm Password *" value="" />
+								</div>
+								<div class="form-group">
+									<label class="form-control">Thumbnail Image</label>
+									<input type="file" class="form-control"  placeholder="Upload Thumbnail" value="" />
+								</div>
+								
+							</div>
+							<div class="col-md-6">								
+								<div class="form-group">
+									<label class="form-control">Category</label>
+									<select class="form-control">
+										<option class="hidden"  selected disabled>Please select your Sequrity Question</option>
+										<option>What is your Birthdate?</option>
+										<option>What is Your old Phone Number</option>
+										<option>What is your Pet Name?</option>
+									</select>
+								</div>	
+								<div class="form-group">
+									<label class="form-control">District</label>
+									<select class="form-control">
+										<option class="hidden"  selected disabled>Please select your Sequrity Question</option>
+										<option>What is your Birthdate?</option>
+										<option>What is Your old Phone Number</option>
+										<option>What is your Pet Name?</option>
+									</select>
+								</div>	
+								<div class="form-group">
+									<label class="form-control">Type</label>
+									<select class="form-control">
+										<option class="hidden"  selected disabled>Please select your Sequrity Question</option>
+										<option>What is your Birthdate?</option>
+										<option>What is Your old Phone Number</option>
+										<option>What is your Pet Name?</option>
+									</select>
+								</div>																
+								<input type="submit" class="btnRegister"  value="Register"/>
+							</div>
+						</div>
+					</div>					
+				</div>
+			</div>
+		</div>
+
+	</div>
+</form>
 
 {% endblock body %}
 

@@ -1,12 +1,14 @@
+from cgi import print_form
 from ctypes import create_string_buffer
 from pickle import NONE
+from urllib import request
 from django.db import models
 from django.http.response import JsonResponse
 from django.shortcuts import render,HttpResponse,redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .forms import CreateUserForm,AddPackageForm
+from .forms import AddCategoryForm1, CreateUserForm,AddPackageForm
 from django.contrib import messages
 from sahayatriapp.models import Company,Slider
 from sahayatriapp.models import Product
@@ -83,7 +85,8 @@ def loginPage(request):
 
 def prod_detail(request,pk):
     produc = Product.objects.get(id=pk)
-    context = { 'produc':produc}
+    cmp=Company.objects.all()
+    context = { 'produc':produc,'cmp':cmp}
     return render(request,'prod_detail.html',context)
 
 
@@ -96,18 +99,42 @@ def dashboard(request):
     
 
 def addPackage(request):
-    form = AddPackageForm()
+    #form = AddPackageForm()
     if request.user.is_authenticated:
-        if request.method == "POST":
-            form = AddPackageForm(request.POST,request.FILES)
+        # if request.method == "POST":
+        #     form = AddPackageForm(request.POST,request.FILES)
             
-            if form.is_valid():
-                user = form.save(commit=False)
-                user.posted_by = request.user
-                user.save()
-                return redirect('index')
-
-        return render(request,'addPackages.html',{'form': form})
+        #     if form.is_valid():
+        #         user = form.save(commit=False)
+        #         user.posted_by = request.user
+        #         user.save()
+        #         return redirect('index')
+        # print(form)
+        cmp=Company.objects.all()
+        context = { 'cmp':cmp}
+        return render(request,'addPackages.html',context)
              
     else:
         return redirect('/login')
+
+def payment(request):
+    return render(request,'payment.html')
+
+def category1(request):
+    return render(request,'category1.html')
+
+def category2(request):
+    return render(request,'category2.html')
+def insertcategory(request):
+    catform=AddCategoryForm1()
+    if request.method=='POST':
+        catform.name=request.POST['catname']
+        catform.startPrice=request.POST['startprice']
+        catform.endPrice=request.POST['endprice']
+        catform.status=request.POST['status']        
+        if catform.is_valid:
+            print('Test Object:',catform.cleaned_data)
+            name = catform.cleaned_data['name']
+            catform.save()                               
+            return JsonResponse({'res':'Success'})
+    return redirect('category1')
