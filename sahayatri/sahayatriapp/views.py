@@ -1,5 +1,7 @@
 from cgi import print_form
 from ctypes import create_string_buffer
+import imp
+import json
 from pickle import NONE
 from urllib import request
 from django.db import models
@@ -12,6 +14,7 @@ from .forms import AddCategoryForm1, CreateUserForm,AddPackageForm
 from django.contrib import messages
 from sahayatriapp.models import BudgetCategory, Company,Slider
 from sahayatriapp.models import Product
+from django.core import serializers
 
 # Create your views here.
 def index(request):
@@ -134,3 +137,10 @@ def insertcategory(request):
         cat=BudgetCategory.objects.create(name=name,startPrice=startPrice,endPrice=endPrice,status=status)                           
         return JsonResponse({'res':'Success'})
     return redirect('category1')
+
+def GetBudgetCategoryList(request):
+    catlist=BudgetCategory.objects.filter(status=True)
+    #data=serializers.serialize('json',catlist)
+    print(list(catlist.values()))
+    return JsonResponse({'catlist': list(catlist.values())})
+

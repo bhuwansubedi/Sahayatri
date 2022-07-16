@@ -49,7 +49,7 @@
         <div class="form-row align-items-center">
           <div class="catformlabel">
             <label class="catformlabel1">Category Name</label>
-            <input type="text" class="form-control" id="catname"  placeholder="Elite/Luxury/Moderate">
+            <input type="text" class="form-control" id="catname"  placeholder="Elite/Luxury/Moderate" >
           </div>
           <div class="catformlabel">
             <label class="catformlabel1" >Start Price</label>                          
@@ -83,14 +83,8 @@
                     </tr>
                 </thead>
                 
-                <tbody>
-                    <tr>
-                        <td>Tiger Nixon</td>
-                        <td>System Architect</td>
-                        <td>Edinburgh</td>
-                        <td>61</td>
-                        <td>2011/04/25</td>                        
-                    </tr>                    
+                <tbody id="catlist">   
+                                         
                 </tbody>
             </table>
         </div>
@@ -116,6 +110,7 @@
 }
 $(document).ready(function(){
     $('#catname').focus();
+    GetBudgetCatList();
 
 });
 $('#catname').keydown(function(e){
@@ -150,7 +145,6 @@ $('#endprice').keydown(function(e){
     
 });
     function SaveCategory(){
-        debugger;
         var catname=$('#catname').val();
         var startprice=$('#startprice').val();
         var endprice=$('#endprice').val();
@@ -194,6 +188,33 @@ $('#endprice').keydown(function(e){
             });
         }
         
+    }
+    function GetBudgetCatList(){
+        $.ajax({
+            url:"{% url 'getBudgetList' %}",
+            type:'get',
+            dataType:'json',
+            success:function(data){
+                var html = '';
+                    if (data !== 0) {
+                        $.each(data.catlist, function (key, item) {  
+                            html +='<tr>';                      
+                            html += '<td>' + item.name + '</td>';
+                            html += '<td>' + item.startPrice + '</td>';
+                            html += '<td>' + item.endPrice + '</td>';
+                            html += '<td>' + item.status + '</td>';
+                            html += '<td>';
+                            html += '<button><i class="fas fa-info"></i></button>';
+                            html += '</td>';
+                            html += '</tr>';
+                        });
+                        $('#catlist').html(html);
+                    }      
+            },
+            error:function(){               
+                toastr.error("Unable to get list!","Error",options);
+            }
+        });
     }
 
 </script>
