@@ -129,18 +129,30 @@ def category1(request):
 def category2(request):
     return render(request,'category2.html')
 def insertcategory(request):    
-    if request.method=='POST':        
+    if request.method=='POST':   
+        id=request.POST['id']   
         name=request.POST['catname']
         startPrice=request.POST['startprice']
         endPrice=request.POST['endprice']
         status=request.POST['status'] 
-        cat=BudgetCategory.objects.create(name=name,startPrice=startPrice,endPrice=endPrice,status=status)                           
-        return JsonResponse({'res':'Success'})
+        if id==0 or id == '':
+            BudgetCategory.objects.create(name=name,startPrice=startPrice,endPrice=endPrice,status=status) 
+            mess=1          
+        else:
+            BudgetCategory.objects.filter(id=id).update(name=name,startPrice=startPrice,endPrice=endPrice,status=status) 
+            mess=2                             
+        return JsonResponse({'mess':mess})
     return redirect('category1')
 
 def GetBudgetCategoryList(request):
     catlist=BudgetCategory.objects.filter(status=True)
     #data=serializers.serialize('json',catlist)
-    print(list(catlist.values()))
     return JsonResponse({'catlist': list(catlist.values())})
+def GetDetail(request):
+    if request.method=='POST':
+        catid=request.POST['catid']
+        deta=BudgetCategory.objects.filter(id=catid)        
+        det = serializers.serialize('json', deta)
+        return HttpResponse(det, content_type="text/json-comment-filtered")       
+        #return JsonResponse(deta)
 
