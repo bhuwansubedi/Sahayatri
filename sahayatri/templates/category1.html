@@ -68,6 +68,10 @@
           <div class="col-auto">
             <button type="button" onclick="SaveCategory();" id="btnSave" class="btn btn-primary mb-2">Save</button>
           </div>
+          <div class="col-auto">
+            <button type="button" onclick="UpdateCategory();" id="btnUpdate" class="btn btn-primary mb-2">Update</button>
+          </div>
+          <input id="pk" hidden>
         </div>
       </form>
       <div class="card-body">
@@ -110,6 +114,7 @@
 }
 $(document).ready(function(){
     $('#catname').focus();
+    $('#btnUpdate').hide();
     GetBudgetCatList();
 
 });
@@ -173,14 +178,21 @@ $('#endprice').keydown(function(e){
                 type:"POST",
                 dataType:"json",
                 data:{
-                    catname:catname,startprice:startprice,endprice:endprice,status:status
+                    id:$('#pk').val(),catname:catname,startprice:startprice,endprice:endprice,status:status
                 },
                 headers: {
                   "X-CSRFToken": "{{csrf_token}}"
                 },
                 success:function(res){
-                    debugger;
-                    toastr.success("Category Added Successfully!","Success",options);
+                    GetBudgetCatList();
+                    RestFiled();
+                    if(res.mess==1){
+                        toastr.success("Category Added Successfully!","Success",options); 
+                    }
+                    else{
+                        toastr.success("Category Updated Successfully!","Success",options);
+                    }
+                    
                 },
                 error:function(){
                     toastr.error("Unable to insert","Error",options);
@@ -204,7 +216,7 @@ $('#endprice').keydown(function(e){
                             html += '<td>' + item.endPrice + '</td>';
                             html += '<td>' + item.status + '</td>';
                             html += '<td>';
-                            html += '<button><i class="fas fa-info"></i></button>';
+                            html += '<button type="button" class="btn success" onclick="GetDetail('+ item.id +')" ><i class="fas fa-edit"></i></button>';
                             html += '</td>';
                             html += '</tr>';
                         });
@@ -215,6 +227,44 @@ $('#endprice').keydown(function(e){
                 toastr.error("Unable to get list!","Error",options);
             }
         });
+    }
+    function GetDetail(id){
+        debugger
+        $.ajax({
+            url:"{% url 'GetDetail' %}",
+            type:'POST',
+            dataType:'json',
+            data:{catid:id},
+            headers: {
+                  "X-CSRFToken": "{{csrf_token}}"
+                },
+            success:function(data){
+                debugger;
+                $('#catname').val(data[0].fields.name);
+                $('#startprice').val(data[0].fields.startPrice);
+                $('#endprice').val(data[0].fields.endPrice);
+                if(data[0].fields.status==true){
+                    $('#status').prop('checked',true);
+                }
+                else{
+                    $('#status').prop('checked',false);
+                }
+                $('#catname').val(data[0].fields.name);
+                // $('#btnSave').hide();
+                // $('#btnUpdate').show();
+                $('#pk').val(data[0].pk);
+            },
+            error:function(){               
+                toastr.error("Unable to get detail!","Error",options);
+            }
+        });
+    }
+    function RestFiled(){
+        $('#catname').val('');
+        $('#startprice').val('');
+        $('#endprice').val('');
+        $('#status').prop('checked',false);
+        
     }
 
 </script>

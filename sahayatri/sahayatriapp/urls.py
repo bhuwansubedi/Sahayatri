@@ -16,4 +16,5 @@ urlpatterns = [
    path('category2',views.category2,name='category2'),
    path('insertcategory/',views.insertcategory,name='insertcategory'),
    path('getBudgetList/',views.GetBudgetCategoryList,name='getBudgetList'),
+   path('GetDetail/',views.GetDetail,name='GetDetail'),
 ]
