@@ -132,10 +132,17 @@ class BudgetCategory(models.Model):
     startPrice=models.BigIntegerField(null=True)
     endPrice=models.BigIntegerField(null=True)
     status=models.BooleanField(default=True,null=True)
+
+    def __str__(self):
+        return self.name
     
 class TypeCategory(models.Model):
-    name=models.CharField(max_length=250,null=True)
+    name=models.CharField(max_length=250,null=True,unique=True)
     status=models.BooleanField(default=True,null=True)
+
+    def __str__(self):
+        return self.name
+
 
 class ImageCollection(models.Model):
     product=models.ForeignKey(Product,related_name='img',on_delete=models.CASCADE,null=True)
