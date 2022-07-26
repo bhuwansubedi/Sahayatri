@@ -12,7 +12,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import AddCategoryForm1, CreateUserForm,AddPackageForm
 from django.contrib import messages
-from sahayatriapp.models import BudgetCategory, Company,Slider
+from sahayatriapp.models import BudgetCategory, Company,Slider,TypeCategory
 from sahayatriapp.models import Product
 from django.core import serializers
 
@@ -128,6 +128,8 @@ def category1(request):
 
 def category2(request):
     return render(request,'category2.html')
+
+
 def insertcategory(request):    
     if request.method=='POST':   
         id=request.POST['id']   
@@ -144,10 +146,13 @@ def insertcategory(request):
         return JsonResponse({'mess':mess})
     return redirect('category1')
 
+
 def GetBudgetCategoryList(request):
     catlist=BudgetCategory.objects.filter(status=True)
     #data=serializers.serialize('json',catlist)
     return JsonResponse({'catlist': list(catlist.values())})
+
+
 def GetDetail(request):
     if request.method=='POST':
         catid=request.POST['catid']
@@ -156,3 +161,37 @@ def GetDetail(request):
         return HttpResponse(det, content_type="text/json-comment-filtered")       
         #return JsonResponse(deta)
 
+
+
+#Category Type Views.... 
+
+def AddTypeCategory(request):
+    if request.method=='POST':   
+        id=request.POST['id']   
+        name=request.POST['typeName']
+        status=request.POST['status'] 
+        if id==0 or id == '':
+            TypeCategory.objects.create(name=name,status=status) 
+            mess=1          
+        else:
+            TypeCategory.objects.filter(id=id).update(name=name,status=status) 
+            mess=2                             
+        return JsonResponse({'mess':mess})
+    return render(request,'TypeCategory.html')
+
+def GetCategoryType():
+    data=TypeCategory.objects.filter(status=True)
+    return JsonResponse({'data': list(data.values())})
+
+def GetCategoryTypeDetail(request):
+    if request.method=='POST':
+        id=request.POST['id']
+        data=TypeCategory.objects.filter(id=id)        
+        toJson = serializers.serialize('json', data)
+        return HttpResponse(toJson, content_type="text/json-comment-filtered") 
+
+def DeleteCategoryType(request):
+    if request.method=='POST':
+        id=request.POST['id']
+        TypeCategory.objects.delete(id=id)        
+        return HttpResponse("Deleted Successfully!") 

@@ -8,13 +8,23 @@ urlpatterns = [
    path('registerMerchant/', views.registerMerchantPage, name="registerMerchant"),
 	path('login/', views.loginPage, name="login"),  
 	path('logout/', views.logoutUser, name="logout"),
+   
    path('addPackage/', views.addPackage, name="addPackage"),     
    path('prod_detail/<str:pk>/', views.prod_detail, name="prod_detail"),
+   
    path('dashboard',views.dashboard,name='dashboard'),
+   
    path('payment',views.payment,name='payment'),
+   
    path('category1',views.category1,name='category1'),
    path('category2',views.category2,name='category2'),
    path('insertcategory/',views.insertcategory,name='insertcategory'),
    path('getBudgetList/',views.GetBudgetCategoryList,name='getBudgetList'),
    path('GetDetail/',views.GetDetail,name='GetDetail'),
+   
+   #Category Type CRUD URLS..
+   path('typecategory/',views.AddTypeCategory,name='typecategory'),
+   path('getcategorytype/',views.GetCategoryType,name='getcategorytype'),
+   path('categorytypedetail/',views.GetCategoryTypeDetail,name='categorytypedetail'),
+   path('deletecategorytype/',views.DeleteCategoryType,name='deletecategorytype'),
 ]
