@@ -1,243 +1,242 @@
 {% extends "base1.html" %}
 
 
-{% block content %}
-<style>
-    .btn-primary {
-    color: #fff;
-    background-color: #4e73df;
-    border-color: #4e73df;
-    width: 100px;
-    margin-left: 10px;
-}
-    .card-body {
-    flex: 1 1 auto;
-    min-height: 1px;
-    padding: 1.25rem;
-    margin-top: -335px;
-}
-    .catform{
-        display: block;
-    align-content: center;
-    margin-left: 250px;
-    margin-top: 15px;
-    }
-    .checkbox{
-        margin-left: 10px;
-    margin-right: 10px;
-    }
-    .form-row {
-    display: flex;
-    flex-wrap: wrap;
-    margin-right: -5px;
-    margin-left: -154px;
-}
-    .catformlabel{
-        display: inline-flex;
-        color: #4e73df; 
-        flex-wrap: nowrap;
-    align-content: space-around;
-    justify-content: flex-start;
-    align-items: baseline;      
-    }
-    .catformlabel1{
-        width: -webkit-fill-available;
-    }
-</style>
-<div>
-    Category Type
-</div>
-<div class="row text-center">
-    <form class="catform" method="post">
-        {% csrf_token %}
-        <div class="form-row align-items-center">
-          <div class="catformlabel">
-            <label class="catformlabel1">Category Type Name</label>
-            <input type="text" class="form-control" id="typeName"  placeholder="" >
-          </div>        
-            <div class="catformlabel" >
-                <input class="checkbox" type="checkbox" id="status">
-                <label class="catformlabel1" for="autoSizingCheck">
-                Status
-                </label>
-            </div>          
-          <div class="col-auto">
-            <button type="button" onclick="SaveCatType();" id="btnSave" class="btn btn-primary mb-2">Save</button>
-          </div>
-          <input id="pk" hidden>
-        </div>
-      </form>
-      <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                <thead>
-                    <tr>
-                        <th>S.N</th>
-                        <th>Category Name</th>
-                        <th>Status</th>                        
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                
-                <tbody id="CatTypeList">   
-                                         
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-</div>
-<script>
-        var options = {
-    "closeButton": true,
-    //   "debug": false,
-    //   "newestOnTop": false,
-    //"progressBar": true,
-    "positionClass": "toast-bottom-right",
-    //   "preventDuplicates": false
-    "showDuration": "300",
-    "hideDuration": "1000",
-    "timeOut": "2000",
-    "extendedTimeOut": "1000",
-    "showEasing": "swing",
-    "hideEasing": "linear",
-    "showMethod": "fadeIn",
-    "hideMethod": "fadeOut"
-    }
-    $(document).ready(function(){
-        GetTypeCategory();
-        $('#btnSave').show();
-    });
-
-
-    function SaveCatType(){
-        var typeName=$('#typeName').val();
-        var status=$('#status').is(':checked');
-        if (status==true){
-            status='True';
+    {% block content %}
+        <style>
+            .btn-primary {
+            color: #fff;
+            background-color: #4e73df;
+            border-color: #4e73df;
+            width: 100px;
+            margin-left: 10px;
         }
-        else{
-            status='False';
+            .card-body {
+            flex: 1 1 auto;
+            min-height: 1px;
+            padding: 1.25rem;
+            margin-top: -335px;
         }
-
-        if(typeName==''||typeName==null){
-            toastr.error("Category Name Cannot Be Null!",options);
-            return false;
-        }
-        else{
-            $.ajax({
-                url: "{% url 'typecategory' %}",
-                type: "POST",
-                dataType: "json",
-                data:{
-                    id:$('#pk').val(),typeName:typeName,status:status
-                },
-                headers: {
-                  "X-CSRFToken": "{{csrf_token}}"
-                },
-                success:function(res){
-                    debugger;
-                    GetTypeCategory();
-                    reset();
-                    if(res.mess==1){
-                        toastr.success("Category Type Added Successfully!","Success",options); 
-                    }
-                    else{
-                        toastr.success("Category Type Updated Successfully!","Success",options);
-                    }
-                    
-                },
-                error:function(){
-                    toastr.error("Unable to insert","Error",options);
-                }
-            });
-        }
-        
-    }
-
-    function GetTypeCategory(){
-        $.ajax({
-            url:"{% url 'getcategorytype' %}",
-            type:'get',
-            dataType:'json',
-            success:function(data){
-                debugger;
-                var html = '';
-                var i = 1;
-                if (data !== 0) {
-                    $.each(data.data, function (key, item) {  
-                        html +='<tr>';                      
-                        html += '<td>' + i + '</td>';
-                        html += '<td>' + item.name + '</td>';
-                        html += '<td>' + item.status + '</td>';
-                        html += `<button type="button" class="btn success" onclick="GetDetail(`+ item.id +`)" ><i class="fas fa-edit"></i></button>
-                                <button type="button" class="btn delete" onclick="Delete(`+ item.id +`)"><i class="fas fa-trash"></i></button>`;
-                        html += '</td>';
-                        html += '</tr>';
-                        i++;
-                    });
-                    $('#CatTypeList').html(html);
-                }      
-            },
-            error:function(){               
-                toastr.error("Unable to get list!","Error",options);
+            .catform{
+                display: block;
+            align-content: center;
+            margin-left: 250px;
+            margin-top: 15px;
             }
-        });
-    }
+            .checkbox{
+                margin-left: 10px;
+            margin-right: 10px;
+            }
+            .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -5px;
+            margin-left: -154px;
+        }
+            .catformlabel{
+                display: inline-flex;
+                color: #4e73df; 
+                flex-wrap: nowrap;
+                align-content: space-around;
+                justify-content: flex-start;
+                align-items: baseline;      
+            }
+            .catformlabel1{
+                width: -webkit-fill-available;
+            }
+        </style>
+        <div>
+            Category Type
+        </div>
+        <div class="row text-center">
+            <form class="catform" method="post">
+                {% csrf_token %}
+                <div class="form-row align-items-center">
+                <div class="catformlabel">
+                    <label class="catformlabel1">Category Type Name</label>
+                    <input type="text" class="form-control" id="typeName"  placeholder="" >
+                </div>        
+                    <div class="catformlabel" >
+                        <input class="checkbox" type="checkbox" id="status">
+                        <label class="catformlabel1" for="autoSizingCheck">
+                        Status
+                        </label>
+                    </div>          
+                <div class="col-auto">
+                    <button type="button" onclick="SaveCatType();" id="btnSave" class="btn btn-primary mb-2">Save</button>
+                </div>
+                <input id="pk" hidden>
+                </div>
+            </form>
+            
 
-    function GetDetail(id){
-        $.ajax({
-            url:"{% url 'categorytypedetail' %}",
-            type:'POST',
-            dataType:'json',
-            data:{id:id},
-            headers: {
-                  "X-CSRFToken": "{{csrf_token}}"
-                },
-            success:function(data){
-                $('#typeName').val(data[0].fields.name);
-                if(data[0].fields.status==true){
-                    $('#status').prop('checked',true);
+        </div>
+        <div class="table">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>S.N</th>
+                            <th>Category Name</th>
+                            <th>Status</th>                        
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody id="CatTypeList">   
+                                            
+                    </tbody>
+                </table>
+        </div>
+        <script>
+                var options = {
+            "closeButton": true,
+            //   "debug": false,
+            //   "newestOnTop": false,
+            //"progressBar": true,
+            "positionClass": "toast-bottom-right",
+            //   "preventDuplicates": false
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "2000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+            }
+            $(document).ready(function(){
+                GetTypeCategory();
+                $('#btnSave').show();
+            });
+
+
+            function SaveCatType(){
+                var typeName=$('#typeName').val();
+                var status=$('#status').is(':checked');
+                if (status==true){
+                    status='True';
                 }
                 else{
-                    $('#status').prop('checked',false);
+                    status='False';
                 }
-                $('#pk').val(data[0].pk);
-            },
-            error:function(){               
-                toastr.error("Unable to get detail!","Error",options);
+
+                if(typeName==''||typeName==null){
+                    toastr.error("Category Name Cannot Be Null!",options);
+                    return false;
+                }
+                else{
+                    $.ajax({
+                        url: "{% url 'typecategory' %}",
+                        type: "POST",
+                        dataType: "json",
+                        data:{
+                            id:$('#pk').val(),typeName:typeName,status:status
+                        },
+                        headers: {
+                        "X-CSRFToken": "{{csrf_token}}"
+                        },
+                        success:function(res){
+                            GetTypeCategory();
+                            reset();
+                            if(res.mess==1){
+                                toastr.success("Category Type Added Successfully!","Success",options); 
+                            }
+                            else{
+                                toastr.success("Category Type Updated Successfully!","Success",options);
+                            }
+                            
+                        },
+                        error:function(){
+                            toastr.error("Unable to insert","Error",options);
+                        }
+                    });
+                }
+                
             }
-        });
-    }
 
-
-
-    function Delete(id)
-    {
-        $.ajax({
-            url:"{% url 'deletecategorytype' %}",
-            type:'POST',
-            dataType:'json',
-            data:{id:id},
-            headers: {
-                  "X-CSRFToken": "{{csrf_token}}"
-                },
-            success:function(data){
-                GetTypeCategory();
-                reset();
-                toastr.success(data);
-            },
-            error:function(){               
-                toastr.error("Unable to delete!","Error",options);
+            function GetTypeCategory(){
+                $.ajax({
+                    url:"{% url 'getcategorytype' %}",
+                    type:'get',
+                    dataType:'json',
+                    success:function(data){
+                        var html = '';
+                        var i = 1;
+                        if (data !== 0) {
+                            $.each(data.data, function (key, item) {
+                                html +='<tr>';                      
+                                html += '<td>' + i + '</td>';
+                                html += '<td>' + item.name + '</td>';
+                                html += '<td>' + item.status + '</td>';
+                                html += `<td> <button type="button" class="btn success" onclick="GetDetail(`+ item.id +`)" ><i class="fas fa-edit"></i></button>
+                                    <button type="button" class="btn success" onclick="Delete(`+ item.id +`)" ><i class="fas fa-trash"></i></button> </td>`;
+                                html += '</td>';
+                                html += '</tr>';
+                                i++;
+                            });
+                            $('#CatTypeList').html(html);
+                        }      
+                    },
+                    error:function(){               
+                        toastr.error("Unable to get list!","Error",options);
+                    }
+                });
             }
-        });
-    }
 
-    function reset(){
-        $('#typeName').val('');
-        $('#status').prop('checked',false);
-    }
+            function GetDetail(id){
+                $.ajax({
+                    url:"{% url 'categorytypedetail' %}",
+                    type:'POST',
+                    dataType:'json',
+                    data:{id:id},
+                    headers: {
+                        "X-CSRFToken": "{{csrf_token}}"
+                        },
+                    success:function(data){
+                        $('#typeName').val(data[0].fields.name);
+                        if(data[0].fields.status==true){
+                            $('#status').prop('checked',true);
+                        }
+                        else{
+                            $('#status').prop('checked',false);
+                        }
+                        $('#pk').val(data[0].pk);
+                    },
+                    error:function(){               
+                        toastr.error("Unable to get detail!","Error",options);
+                    }
+                });
+            }
 
-</script>
 
-{% endblock content %}
+
+            function Delete(id)
+            {
+                debugger;
+                $.ajax({
+                    url:"{% url 'deletecategorytype' %}",
+                    type:'POST',
+                    dataType:'json',
+                    data:{id:id},
+                    headers: {
+                        "X-CSRFToken": "{{csrf_token}}"
+                        },
+                    success:function(data){
+                        GetTypeCategory();
+                        reset();
+                        toastr.success('Deleted Successsfully!');
+                    },
+                    error:function(){               
+                        toastr.error("Unable to delete!","Error",options);
+                    }
+                });
+            }
+
+            function reset(){
+                $('#typeName').val('');
+                $('#pk').val('');
+                $('#status').prop('checked',false);
+            }
+
+        </script>
+
+    {% endblock content %}
