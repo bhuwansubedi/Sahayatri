@@ -67,15 +67,12 @@
             </div>          
           <div class="col-auto">
             <button type="button" onclick="SaveCategory();" id="btnSave" class="btn btn-primary mb-2">Save</button>
-          </div>
-          <div class="col-auto">
-            <button type="button" onclick="UpdateCategory();" id="btnUpdate" class="btn btn-primary mb-2">Update</button>
-          </div>
+          </div>    
           <input id="pk" hidden>
         </div>
       </form>
-      <div class="card-body">
-        <div class="table-responsive">
+      <!-- <div class="card-body"> -->
+        <div class="table-responsive card-body">
             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
@@ -94,7 +91,6 @@
         </div>
     </div>
 
-</div>
 <script>
     var options = {
    "closeButton": true,
@@ -114,7 +110,6 @@
 }
 $(document).ready(function(){
     $('#catname').focus();
-    $('#btnUpdate').hide();
     GetBudgetCatList();
 
 });

@@ -43,10 +43,7 @@
             .catformlabel1{
                 width: -webkit-fill-available;
             }
-        </style>
-        <div>
-            Category Type
-        </div>
+        </style>       
         <div class="row text-center">
             <form class="catform" method="post">
                 {% csrf_token %}
@@ -69,8 +66,7 @@
             </form>
             
 
-        </div>
-        <div class="table">
+            <div class="table-responsive card-body">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
@@ -85,6 +81,8 @@
                                             
                     </tbody>
                 </table>
+            </div>
+        
         </div>
         <script>
                 var options = {

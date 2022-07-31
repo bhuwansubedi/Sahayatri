@@ -1,0 +1,260 @@
+{% extends "base1.html" %}
+
+{% block content %}
+<style>
+    .btn-primary {
+    color: #fff;
+    background-color: #4e73df;
+    border-color: #4e73df;
+    width: 100px;
+    margin-left: 10px;
+}
+    .card-body {
+    flex: 1 1 auto;
+    min-height: 1px;
+    padding: 1.25rem;
+    margin-top: -335px;
+}
+    .catform{
+        display: block;
+    align-content: center;
+    margin-left: 250px;
+    margin-top: 15px;
+    }
+    .checkbox{
+        margin-left: 10px;
+    margin-right: 10px;
+    }
+    .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -5px;
+    margin-left: -154px;
+}
+    .catformlabel{
+        display: inline-flex;
+        color: #4e73df; 
+        flex-wrap: nowrap;
+    align-content: space-around;
+    justify-content: flex-start;
+    align-items: baseline;      
+    }
+    .catformlabel1{
+        width: -webkit-fill-available;
+    }
+</style>
+<div class="row text-center">
+    <form class="catform" method="post">
+        {% csrf_token %}
+        <div class="form-row align-items-center">
+          <div class="catformlabel">
+            <label class="catformlabel1">Category Name</label>
+            <input type="text" class="form-control" id="catname"  placeholder="Elite/Luxury/Moderate" >
+          </div>            
+            <div class="catformlabel" >
+              <input class="checkbox" type="checkbox" id="status">
+              <label class="catformlabel1" for="autoSizingCheck">
+                Status
+              </label>
+            </div>          
+          <div class="col-auto">
+            <button type="button" onclick="SaveCategory();" id="btnSave" class="btn btn-primary mb-2">Save</button>
+          </div>
+          <div class="col-auto">
+            <button type="button" onclick="UpdateCategory();" id="btnUpdate" class="btn btn-primary mb-2">Update</button>
+          </div>
+          <input id="pk" hidden>
+        </div>
+      </form>
+      <!-- <div class="card-body"> -->
+        <div class="table-responsive card-body">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Category Name</th>
+                        <th>Start Price</th>                  
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                
+                <tbody id="catlist">   
+                                         
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+<script>
+    var options = {
+   "closeButton": true,
+//   "debug": false,
+//   "newestOnTop": false,
+   //"progressBar": true,
+  "positionClass": "toast-bottom-right",
+//   "preventDuplicates": false
+   "showDuration": "300",
+  "hideDuration": "1000",
+  "timeOut": "2000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+}
+$(document).ready(function(){
+    $('#catname').focus();
+    $('#btnUpdate').hide();
+    GetBudgetCatList();
+
+});
+$('#catname').keydown(function(e){
+    if(e.keyCode==13){
+        if( $('#catname').val()==""|| $('#catname').val()==null){            
+        toastr.error("Cannot leave null field","Error",options);
+        return false;        
+        }
+        $('#startprice').focus();
+    }
+    
+});
+$('#startprice').keydown(function(e){
+    if(e.keyCode==13){
+        if( $('#startprice').val()==""|| $('#startprice').val()==null){
+        toastr.error("Cannot leave null field","Error",options);
+        return false;        
+        }
+        $('#endprice').focus();
+    }
+    
+});
+$('#endprice').keydown(function(e){
+    if(e.keyCode==13){
+        if( $('#endprice').val()==""|| $('#endprice').val()==null){
+        toastr.error("Cannot leave null field","Error");
+        return false;        
+        }
+        toastr.warning("Make Sure to Check Status!","Warning",options);
+        // $('#btnSave').focus();
+    }
+    
+});
+    function SaveCategory(){
+        var catname=$('#catname').val();
+        var startprice=$('#startprice').val();
+        var endprice=$('#endprice').val();
+        var status=$('#status').is(':checked');
+        if (status==true){
+            status='True';
+        }
+        else{
+            status='False';
+        }
+
+        if(catname==''||catname==null){
+            toastr.error("Category Name Cannot Be Null!",options);
+            return fales;
+        }
+       else if(startprice==''||startprice==null){
+            toastr.error("Start Price Cannot Be Zero!",options);
+            return fales;
+        }
+        else if(endprice==''||endprice==null){
+            toastr.error("End Price Cannot Be Zero!",options);
+            return fales;
+        }else{
+            $.ajax({
+                url:"{% url 'insertcategory' %}",
+                type:"POST",
+                dataType:"json",
+                data:{
+                    id:$('#pk').val(),catname:catname,startprice:startprice,endprice:endprice,status:status
+                },
+                headers: {
+                  "X-CSRFToken": "{{csrf_token}}"
+                },
+                success:function(res){
+                    GetBudgetCatList();
+                    RestFiled();
+                    if(res.mess==1){
+                        toastr.success("Category Added Successfully!","Success",options); 
+                    }
+                    else{
+                        toastr.success("Category Updated Successfully!","Success",options);
+                    }
+                    
+                },
+                error:function(){
+                    toastr.error("Unable to insert","Error",options);
+                }
+            });
+        }
+        
+    }
+    function GetBudgetCatList(){
+        $.ajax({
+            url:"{% url 'getBudgetList' %}",
+            type:'get',
+            dataType:'json',
+            success:function(data){
+                var html = '';
+                    if (data !== 0) {
+                        $.each(data.catlist, function (key, item) {  
+                            html +='<tr>';                      
+                            html += '<td>' + item.name + '</td>';
+                            html += '<td>' + item.startPrice + '</td>';                   
+                            html += '<td>';
+                            html += '<button type="button" class="btn success" onclick="GetDetail('+ item.id +')" ><i class="fas fa-edit"></i></button>';
+                            html += '</td>';
+                            html += '</tr>';
+                        });
+                        $('#catlist').html(html);
+                    }      
+            },
+            error:function(){               
+                toastr.error("Unable to get list!","Error",options);
+            }
+        });
+    }
+    function GetDetail(id){
+        debugger;
+        $.ajax({
+            url:"{% url 'GetDetail' %}",
+            type:'POST',
+            dataType:'json',
+            data:{catid:id},
+            headers: {
+                  "X-CSRFToken": "{{csrf_token}}"
+                },
+            success:function(data){
+                debugger;
+                $('#catname').val(data[0].fields.name);
+                $('#startprice').val(data[0].fields.startPrice);
+                $('#endprice').val(data[0].fields.endPrice);
+                if(data[0].fields.status==true){
+                    $('#status').prop('checked',true);
+                }
+                else{
+                    $('#status').prop('checked',false);
+                }
+                $('#catname').val(data[0].fields.name);
+                // $('#btnSave').hide();
+                // $('#btnUpdate').show();
+                $('#pk').val(data[0].pk);
+            },
+            error:function(){               
+                toastr.error("Unable to get detail!","Error",options);
+            }
+        });
+    }
+    function RestFiled(){
+        $('#catname').val('');
+        $('#startprice').val('');
+        $('#endprice').val('');
+        $('#status').prop('checked',false);
+        
+    }
+
+</script>
+
+{% endblock content %}
