@@ -179,7 +179,7 @@ def AddTypeCategory(request):
         return JsonResponse({'mess':mess})
     return render(request,'TypeCategory.html')
 
-def GetCategoryType():
+def GetCategoryType(request):
     data=TypeCategory.objects.filter(status=True)
     return JsonResponse({'data': list(data.values())})
 
@@ -193,5 +193,5 @@ def GetCategoryTypeDetail(request):
 def DeleteCategoryType(request):
     if request.method=='POST':
         id=request.POST['id']
-        TypeCategory.objects.delete(id=id)        
-        return HttpResponse("Deleted Successfully!") 
+        data = TypeCategory.objects.filter(id=id).delete()      
+        return JsonResponse({'data':data})
