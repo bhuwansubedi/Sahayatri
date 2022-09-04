@@ -102,19 +102,11 @@ def dashboard(request):
     
 
 def addPackage(request):
-    #form = AddPackageForm()
     if request.user.is_authenticated:
-        # if request.method == "POST":
-        #     form = AddPackageForm(request.POST,request.FILES)
-            
-        #     if form.is_valid():
-        #         user = form.save(commit=False)
-        #         user.posted_by = request.user
-        #         user.save()
-        #         return redirect('index')
-        # print(form)
+        catlist=BudgetCategory.objects.filter(status=True)
+        data=TypeCategory.objects.filter(status=True)
         cmp=Company.objects.all()
-        context = { 'cmp':cmp}
+        context = { 'cmp':cmp,'catlist':catlist,'data':data}
         return render(request,'addPackages.html',context)
              
     else:
