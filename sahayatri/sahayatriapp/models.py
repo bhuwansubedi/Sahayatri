@@ -49,6 +49,8 @@ class Product(models.Model):
     posted_by = models.CharField(max_length=200,null=True)
     date_created = models.DateTimeField(auto_now_add=True,null=True)
     status=models.BooleanField(default=False)
+    inclusions=models.TextField(null=True)
+    exclusions=models.TextField(null=True)
 
     def __str__(self):
         return self.name
@@ -125,6 +127,13 @@ class Itnerary(models.Model):
     author=models.ForeignKey(Merchant,on_delete=models.CASCADE,null=True)
     day=models.CharField(max_length=250,default='Day 1',null=True)
     detail=models.TextField(null=True)
+    travel=models.TextField(null=True)
+    breakfast=models.TextField( null=True)
+    lunch=models.TextField(null=True)
+    dinner=models.TextField(null=True)
+    accomodation=models.TextField(null=True)
+    sighting=models.TextField(null=True)
+    extra=models.TextField(null=True)
     status=models.BooleanField(default=True)
 
 class BudgetCategory(models.Model):
