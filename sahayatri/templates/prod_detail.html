@@ -1,8 +1,107 @@
 {% extends "base.html" %}
 
 {% block body %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+  .slick-slide img {
+    width: 100%;
+    height: 379px;
+    display: block;
+    
+}
+.content {
+  text-align: center;
+}
+.content h1 {
+  font-family: 'Sansita', sans-serif;
+  letter-spacing: 1px;
+  font-size: 50px;
+  color: #282828;
+  margin-bottom: 10px;
+}
+.content  i {
+  color: #FFC107;
+}
+.content span {
+  position: relative;
+  display: inline-block;
+}
+.content  span:before, .content  span:after {
+  position: absolute;
+  content: "";
+  background-color: #282828;
+  width: 40px;
+  height: 2px;
+  top: 40%;
+}
+.content  span:before {
+  left: -45px;
+}
+.content  span:after {
+  right: -45px;
+}
+.content p {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+.wrapper {
+  position: relative;
+  display: inline-block;
+  border: none;
+  font-size: 14px;
+  margin: 50px auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
 
+.wrapper input {
+  border: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  position: absolute !important;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  opacity: 0;
+}
 
+.wrapper label {
+  position: relative;
+  float: right;
+  color: #C8C8C8;
+}
+.star{
+  display: block;
+  position: relative;
+  margin-left: 34px;
+}
+
+.wrapper label:before {  
+  margin: 5px;
+  content: "\f005";
+  font-family: FontAwesome;
+  display: inline-block;
+  font-size: 1.5em;
+  color: #ccc;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  
+}
+
+.wrapper input:checked ~ label:before {
+  color: #FFC107;
+}
+
+.wrapper label:hover ~ label:before {
+  color: #ffdb70;
+}
+
+.wrapper label:hover:before {
+  color: #FFC107;
+}
+</style>
 
   <!-- START PRELOADER -->
   <div class="preloader">
@@ -35,35 +134,167 @@
           </div>
       </div>
   <!-- End Top Header -->
+  <!-- START Banner Image
+  <div class="main_banner_area banner_image" style="background: url(assets/img/bg/main-banner.jpg)no-repeat;background-size:cover;  background-position: center center;background-attachment:fixed;">
+    <div class="container">
+      <div class="bannar_padding text-center" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
+        <h2 class="title_blog">Portfolio Details</h2>
+        <p><a href="#">Home - </a> Portfolio Title</p>
+      </div>
+    </div>
+  </div>
+  END Banner Image -->	
+  <!-- <div class="clearfix"></div> --> 
 
-  <div class="container">
+  <section class="portfolio-details section-padding">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 col-md-12 col-xs-12">
+          <div class="portfolio-slider">
+            <div class="single-portfolio"><img src="{{ produc.image1.url }}" alt="slider image" /></div>
+            <div class="single-portfolio"><img src="{{ produc.image2.url }}" alt="slider image" /></div>
+            <div class="single-portfolio"><img src="{{ produc.image3.url }}" alt="slider image" /></div>
+            <div class="single-portfolio"><img src="{{ produc.image4.url }}" alt="slider image" /></div>            		
+          </div>
+        </div><!-- END  Col -->	
+        
+        <div class="col-lg-6 col-md-12 col-xs-12">
+          <div class="portfolio-info">
 
-    <div class="row">
-      <div class="col-lg-9">
-          <!-- /.card -->
-          
-        <div class="card mt-4">
-          <img class="card-img-top img-fluid" src="{{ produc.image.url }}" alt="" style="height: 30%; width: 50%;">
-          <div class="card-body">
-            <h3 class="card-title">{{ produc.name }}</h3>
-            <h4>NPR: {{ produc.price }}</h4>
-            <p class="card-text">Posted by: {{ produc.posted_by }}</p>
-            <p class="card-text">Category: {{ produc.category }}</p>
-            <p class="card-text">Details: {{ produc.description }}</p>
+            <div class="project-info">
+              <p><strong><i class="ti-user"></i> {{ produc.posted_by }}</strong> <br /> </p>
+              <p><strong><i class="ti-folder"></i> {{ produc.category }}</strong> <br /> </p>
+              <p><strong><i class="ti-timer"></i>  {{ produc.days }}D /{{ produc.nights }} N</strong><br /> </p>
+              <p><strong><i class="ti-tag"></i>  NPR {{ produc.price }}</strong> <br /> </p>              
+            </div>
+           
             
           </div>
           
         </div>
-        <a href="#" class="btn btn-success" style="margin-bottom: 40px;margin-top: 20px;" data-toggle="modal" data-target="#exampleModal">Buy This Package</a>
-        </div>
+        {% if request.user.is_authenticated  %}
+        <form action="">
+          {% csrf_token %}
+          <div class="wrapper star">
+          
+            <input type="checkbox" class="rate" id="st1" value="5" />
+            <label for="st1"></label>
+            <input type="checkbox" class="rate" id="st2" value="4" />
+            <label for="st2"></label>
+            <input type="checkbox" class="rate" id="st3" value="3" />
+            <label for="st3"></label>
+            <input type="checkbox" class="rate" id="st4" value="2" />
+            <label for="st4"></label>
+            <input type="checkbox" class="rate" id="st5" value="1" />
+            <label for="st5"></label>
+            
+          </div>
+        </form>
+        {% endif %}
         
+        <div class="clearfix"></div>
+        
+        <div class="col-md-12">
+          <div class="portfolio-details-content">
+            <h3 class="port-title">{{ produc.name }}</h3>
+            <p>
+              {{ produc.description }}
+            </p>
+            
+            
+            <h3 class="port-title"><strong><i class="ti-world"></i> Itnerary</strong> </h3>
+            <p id="itnerary">
+              
+            </p>
 
+
+            <h3 class="port-title"><strong><i class="ti-eye"></i> Overview</strong> </h3>
+            <p id="overview">
+              
+            </p>
+
+            <h3 class="port-title"><strong><i class="ti-control-forward"></i> Inclusions</strong> </h3>
+            <p id="inclusion">
+              
+            </p>
+
+            <h3 class="port-title"><strong><i class="ti-control-backward"></i> Exclusions</strong> </h3>
+            <p id="exclusion">
+              
+            </p>
+
+          </div>
+        </div><!-- END  Col -->	
+        
+        <div class="clearfix"></div>
+        
       </div>
-      <!-- /.col-lg-9 -->
-
     </div>
+  </section><!-- END portfolio-details -->	
+  <script type="text/javascript"> 
+    var itner = "{{ produc.Itnerary }}";     
+    var html=$.parseHTML(itner);
+    var itner=document.getElementById('itnerary');
+    itner.innerHTML=html[0].data;
 
-  </div>
+    //Overview
+    var ov_text = "{{ produc.overview }}";     
+    var ov_html=$.parseHTML(ov_text);
+    var ov=document.getElementById('overview');
+    ov.innerHTML=ov_html[0].data;
 
+    //Inclusion
+    var text = `{{ produc.inclusions|safe }}`;   
+    //text.replace('<p>',"");
+    var inhtml=$.parseHTML(text);
+    var i=0;
+    var temp="";
+    for (i=0;i<inhtml.length;i++){
+      temp+=inhtml[i].innerHTML;
+    }    
+     var inc=document.getElementById('inclusion');
+     inc.innerHTML=temp;
+     //Exclusion
+    var text = `{{ produc.exclusions|safe }}`;   
+    text.replace('<p>',"");
+    var inhtml=$.parseHTML(text);
+    var i=0;
+    var temp="";
+    for (i=0;i<inhtml.length;i++){
+      temp+=inhtml[i].innerHTML;
+    }    
+     var inc=document.getElementById('exclusion');
+     inc.innerHTML=temp;
+    $('.rate').on('click',function(){
+      var prodid="{{ produc.id }}"
+      var rating=parseInt($(this).val());    
+      var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+      console.log($(this).val());
+      $.ajax({
+        url:"{% url 'saveRating' %}",
+        dataType:'json',
+        method:'post',
+        data:{rating:rating,prodid:prodid},
+        headers: {
+        "X-CSRFToken": csrftoken
+          },
+          success:function(data){
+            debugger;
+            if(data.data==2){
+              toastr.success("Rating Saved Successfully!");
+            }
+            else{
+              toastr.error("Duplication Error!","You cannot rate same product twice!");
+            }
+            
+          },
+          error:function(data){
+            toastr.error("Error while rating product!");
+          }
+      });
+        
+    });
+
+ </script>
 
 {% endblock body %}

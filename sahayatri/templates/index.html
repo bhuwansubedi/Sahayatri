@@ -3,7 +3,13 @@
 
 {% block body %}
 
-
+	<style>
+		.pimage{
+			height: 286px;
+			min-width: 100%;
+    		min-height: 100%;
+		}
+	</style>
 	<!-- START PRELOADER -->
 	<div class="preloader">
 		<div class="status">
@@ -43,7 +49,7 @@
 			<div class="row">
 				<div class="col-lg-2 col-md-3 col-sm-4">			
 					<div class="navbar-header">        
-						<a href="index.html" class="navbar-brand"><img src="{{ cmp.logo.url  }}" alt="logo"></a>
+						<a href="{% url 'index' %}" class="navbar-brand"><img src="{{ cmp.logo.url  }}" alt="logo"></a>
 					</div>	
 				</div><!--- END Col -->
 			
@@ -52,7 +58,10 @@
 						<ul>
 							<li><a href="#home">Home</a></li>
 							{% if request.user.is_authenticated %}
-								<li><a class="nav-link text-black font-weight-bold" href="{% url 'logout' %}">Logout</a></li>
+							<li><a class="nav-link text-black font-weight-bold" href="{% url 'logout' %}">Logout</a>									
+							<li><a class="nav-link text-black font-weight-bold" href="{% url 'profile' %}"><span>
+								<img src="https://cdn4.iconfinder.com/data/icons/small-n-flat/24/user-512.png" width="30" height="30" alt="">
+							</span>{{ request.user.username }}</a>									
 							{% else %}
 								<li><a href="{% url 'registerMerchant' %}">Register Merchant</a></li>
 								<li><a class="nav-link text-black font-weight-bold" href="{% url 'login' %}">Login</a></li>
@@ -151,66 +160,84 @@
 	<!-- END  HOME DESIGN -->	
 
 	<!-- START FEATURE-->
-	<section id="features" class="features">
-		<div class="container">				
-			<div class="section-title text-left wow zoomIn">
-				<div class="row">
-					<div class="col-lg-6">
-						<span>Our Features</span>	
-						<h2>Awesome Features in <br> our Template </h2>
-					</div>
-				
-				</div>
-			</div>
-			
-			<div class="row text-left">
-				<!-- <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="single_about">
-						<i class="ti-check-box about_icon"></i>
-						<h4>W3C Validation</h4>
-						<p>It is a long established fact that a reader will be distracted by the readable content of a page looking .</p>
-					</div>				
-				</div> -->
-				
-				<!--- END COL -->	
+	
 
-				<!-- <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="single_about active_feature">
-						<i class="ti-rocket about_icon"></i>
-						<h4>Super Fast</h4>
-						<p>It is a long established fact that a reader will be distracted by the readable content of a page looking.</p>
-					</div>				
-				</div> -->
-				<!--- END COL -->
-				
-				<!-- <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="single_about">
-						<i class="ti-light-bulb about_icon"></i>
-						<h4>Latest Bootstrap</h4>
-						<p>It is a long established fact that a reader will be distracted by the readable content of a page looking.</p>
-					</div>				
-				</div> -->
-				<!--- END COL -->	
-				{% for q in query %}
-				<div class="col-lg-4 col-md-6 mb-4">
-					<div class="card h-100">
-					<a href="#"><img class="card-img-top" src="{{ q.image.url }}" alt="" style="height:auto ;width: 100%;"></a>
-					<div class="card-body">
-						<h4 class="card-title">
-							<a href="{% url 'prod_detail' q.id %}">{{ q.name }}</a>
-						</h4>
-						<p class="card-text">{{ q.posted_by }}</p>
+
+	<!-- START BLOG -->		
+	<section id="blog" class="fresh-news section-padding">
+		{% if request.user.is_authenticated %}
+		<div class="container">
+			<div class="section-title text-center wow zoomIn">
+				<span>Recommended for you</span>	
+				<h2>Check out tour packages <br /> that you may like </h2>
+			</div>				
+			<div class="row">	
+				{% for q in recomlist %}				
+				<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+					<div class="single_blog">
+						<div class="blog_img">
+							<a href="{% url 'prod_detail' q.prod_id %}"><img src="{{ q.image.url }}" class="img-fluid pimage" alt="image" /></a>
+						</div>
+						<div class="blog_content">
+							<span class="blog_cat">
+								<a href="#">Book</a>
+								<a href="#">Add to Bucketlist</a>
+								<a href="#">{{ q.nights }}N {{ q.days }} D</a>
+							</span>
+							<h3><a href="{% url 'prod_detail' q.prod_id %}">{{ q.prod_name }}</a></h3>								
+							<div class="blog-meta">
+								<span class="blog-author">
+									<img src="https://previews.123rf.com/images/martialred/martialred1708/martialred170800071/84363440-available-now-label-badge-seal-or-burst-flat-vector-icon-for-apps-and-websites.jpg" alt="author icon" /> 
+									<a href="#">NPR {{ q.price }}</a>
+								</span> 
+								<span class="blog-date">{{ q.valid_date | date:'d M Y' }}</span>								
+							</div>
+							<a href="{% url 'prod_detail' q.prod_id %}" class="blog_btn"><i class="ti-arrow-right"></i></a>
+						</div>
 					</div>
-					<div class="card-footer">
-						<small class="text-muted"><h5>{{ q.price }}</h5></small>
-					</div>
-					</div>
-				</div>
+				</div><!-- END COL-->	
 				{% endfor %}
-							
-			</div><!--- END ROW -->								
-		</div><!--- END CONTAINER -->
+																
+			</div><!-- END ROW -->
+		</div>
+		{% endif %}
+		
+		<div class="container">
+			<div class="section-title text-center wow zoomIn">
+				<span>Popular Destinations</span>	
+				<h2>Check out most popular <br /> tour packages </h2>
+			</div>				
+			<div class="row">	
+				{% for q in query %}				
+				<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+					<div class="single_blog">
+						<div class="blog_img">
+							<a href="{% url 'prod_detail' q.id %}"><img src="{{ q.image.url }}" class="img-fluid pimage" alt="image" /></a>
+						</div>
+						<div class="blog_content">
+							<span class="blog_cat">
+								<a href="#">Book</a>
+								<a href="#">Add to Bucketlist</a>
+								<a href="#">{{ q.nights }}N {{ q.days }} D</a>
+							</span>
+							<h3><a href="{% url 'prod_detail' q.id %}">{{ q.name }}</a></h3>								
+							<div class="blog-meta">
+								<span class="blog-author">
+									<img src="https://previews.123rf.com/images/martialred/martialred1708/martialred170800071/84363440-available-now-label-badge-seal-or-burst-flat-vector-icon-for-apps-and-websites.jpg" alt="author icon" /> 
+									<a href="#">NPR {{ q.price }}</a>
+								</span> 
+								<span class="blog-date">{{ q.valid_date | date:'d M Y' }}</span>								
+							</div>
+							<a href="{% url 'prod_detail' q.id %}" class="blog_btn"><i class="ti-arrow-right"></i></a>
+						</div>
+					</div>
+				</div><!-- END COL-->	
+				{% endfor %}
+																
+			</div><!-- END ROW -->
+		</div><!-- END CONTAINER -->	
 	</section>
+	<!-- END BLOG -->
 	<!-- END FEATURE -->		
 
 	<!-- START ABOUT US -->

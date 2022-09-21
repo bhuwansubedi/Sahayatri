@@ -1,9 +1,18 @@
+
 from cgi import print_form
 from ctypes import create_string_buffer
+import email
+from email.mime import image
+from fileinput import filename
+from hashlib import new
 import imp
+from itertools import count
 import json
+from math import dist
 from pickle import NONE
+from unicodedata import name
 from urllib import request
+from xmlrpc.client import DateTime
 from django.db import models
 from django.http.response import JsonResponse
 from django.shortcuts import render,HttpResponse,redirect
@@ -12,17 +21,156 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import AddCategoryForm1, CreateUserForm,AddPackageForm
 from django.contrib import messages
-from sahayatriapp.models import BudgetCategory, Company,Slider,TypeCategory
+from django.core.files.storage import FileSystemStorage
+from sahayatriapp.models import BudgetCategory, Company, Rating,Slider,TypeCategory,Product,District,Municipality,Province,Customer
 from sahayatriapp.models import Product
 from django.core import serializers
+from math import sqrt
+import pandas as pd
+import numpy as np
+from scipy import sparse
+from sklearn.metrics.pairwise import cosine_similarity
+import random
+import warnings
+warnings.filterwarnings('ignore')
+import csv
+from django.contrib.auth.models import User
 
 # Create your views here.
+def standardize(row):
+    new_row = (row - row.mean()) / (row.max() - row.min())
+    return new_row 
+
+
+def read_rating_cs(request):
+    prod=Product.objects.all()
+    rating=Rating.objects.all()
+    x=[]
+    y=[]
+    A=[]
+    B=[]
+    C=[]
+    D=[]
+    for item in prod:
+        x=[item.id,item.name,item.price,item.image,item.days,item.nights,item.valid_date]
+        y+=[x]
+    prod_df=pd.DataFrame(y,columns=['prod_id','prod_name','prod_price','image','days','nights','valid_date'])
+    for item in rating:
+        A=[item.user.id,item.item.id,item.rating]
+        B+=[A]
+    rating_df=pd.DataFrame(B,columns=['user_id','prod_id','rating'])
+    rating_df['user_id']=rating_df['user_id'].astype(str).astype(np.int64)
+    rating_df['prod_id']=rating_df['prod_id'].astype(str).astype(np.int64)
+    rating_df['rating']=rating_df['rating'].astype(str).astype(np.float)
+    if request.user.is_authenticated:
+        userid=request.user.id
+        userInput=Rating.objects.select_related('item').filter(user=userid)
+        if(userInput.count()==0):
+            recommenderQuery=None
+            userInput=None
+        else:
+            for item in userInput:
+                C=[item.item.name,item.rating]
+                D+=[C]
+            inputPackage=pd.DataFrame(D,columns=['prod_name','rating'])
+            #print("List of Rated packages by "+request.user.username)
+            inputPackage['rating']=inputPackage['rating'].astype(str).astype(np.float)
+            inputId=prod_df[prod_df['prod_name'].isin(inputPackage['prod_name'].tolist())]
+            inputPackage=pd.merge(inputPackage,inputId)
+            #print(inputPackage)
+
+            userSubset=rating_df[rating_df['prod_id'].isin(inputPackage['prod_id'].tolist())]
+            #print(userSubset)
+            userSubsetGroup=userSubset.groupby('user_id')
+            userSubsetGroup = sorted(userSubsetGroup,  key=lambda x: len(x[1]), reverse=True)
+            #print(userSubsetGroup[0:])  
+            userSubsetGroup = userSubsetGroup[0:]
+            pearsonCorrelationDict = {}
+
+            for name, group in userSubsetGroup:
+                group=group.sort_values(by='prod_id')
+                inputPackage=inputPackage.sort_values(by='prod_id')
+                nRatings=len(group)
+
+                temp_df=inputPackage[inputPackage['prod_id'].isin(group['prod_id'].tolist())]
+                tempRatingList=temp_df['rating'].tolist()
+                tempGroupList = group['rating'].tolist()
+                Sxx = sum([i**2 for i in tempRatingList]) - pow(sum(tempRatingList),2)/float(nRatings)
+                Syy = sum([i**2 for i in tempGroupList]) - pow(sum(tempGroupList),2)/float(nRatings)
+                Sxy = sum( i*j for i, j in zip(tempRatingList, tempGroupList)) - sum(tempRatingList)*sum(tempGroupList)/float(nRatings)                
+                if Sxx != 0 and Syy != 0:
+                    pearsonCorrelationDict[name] = Sxy/sqrt(abs(Sxx*Syy))
+                else:
+                    pearsonCorrelationDict[name] = 0
+            #print(pearsonCorrelationDict.items())
+
+            pearsonDF = pd.DataFrame.from_dict(pearsonCorrelationDict, orient='index')
+            pearsonDF.columns = ['similarityIndex']
+            #print(pearsonDF)
+            pearsonDF['user_id']=pearsonDF.index
+            pearsonDF.index = range(len(pearsonDF))
+            #print(pearsonDF.head())
+            topUsers=pearsonDF.sort_values(by='similarityIndex', ascending=False)[0:]
+            #print(topUsers.head())
+
+            topUsersRating=topUsers.merge(rating_df, left_on='user_id', right_on='user_id', how='inner')
+            topUsersRating.head()
+
+            topUsersRating['weightedRating'] = topUsersRating['similarityIndex']*topUsersRating['rating']
+            topUsersRating.head()
+
+            tempTopUsersRating = topUsersRating.groupby('prod_id').sum()[['similarityIndex','weightedRating']]
+            tempTopUsersRating.columns = ['sum_similarityIndex','sum_weightedRating']
+            #print(tempTopUsersRating.head())
+
+            recommendation_df = pd.DataFrame()
+            #Now we take the weighted average
+            recommendation_df['weighted average recommendation score'] = tempTopUsersRating['sum_weightedRating']/tempTopUsersRating['sum_similarityIndex']
+            recommendation_df['prod_id'] = tempTopUsersRating.index
+            recommendation_df.head()
+
+            recommendation_df = recommendation_df.sort_values(by='weighted average recommendation score', ascending=False)
+            recommender=prod_df.loc[prod_df['prod_id'].isin(recommendation_df.head(6)['prod_id'].tolist())]
+            #print(recommender)
+            return recommender.to_dict('records')        
+    # rate_list = Rating.objects.all()    
+    # rating = rate_list.values_list('id','item', 'user', 'rating')  
+    # df = pd.DataFrame.from_records(rating,index=0)    
+    # ptable=pd.pivot_table(df,values='0',index=['0','0'],columns=['0'])
+    # print(ptable)
+    # df.fillna(0)
+    # ratings_std=df.apply(standardize)
+    # user_similarity = cosine_similarity(ratings_std)
+    # user_similarity_df = pd.DataFrame(user_similarity, index=df.index, columns=df.index) 
+    # print (user_similarity_df)          
+    # def get_similar_product(item,item_rate):
+    #     mean_rating=2.5
+    #     similar_score = user_similarity_df[item] * (item_rate - mean_rating) # 2.5 is the mean of the ratings
+    #     similar_score = similar_score.sort_values(ascending=False)
+    #     return similar_score[:10]
+    # print(get_similar_product(36,5))
+    # # num=userid 
+    # # similar_users=get_similar_product(num,item_rate)    
+    # # users = similar_users.index.values.tolist()
+    # # print(users)
+    # # new_ratings = df.rating[users, :]
+    # # new_ratings = new_ratings.fillna(0)
+    # # print(new_ratings)
+
+
+
 def index(request):
-    query = Product.objects.all()
+    recommended= read_rating_cs(request)           
+    generic_list=Product.objects.all()    
     cmp=Company.objects.all()
     sld=Slider.objects.all()
-    context={'query':query,'cmp':cmp,'sld':sld}
-    return render(request,'index.html',context)
+    context={'query':generic_list,'cmp':cmp,'sld':sld,'recomlist':recommended}
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
+        return redirect('addPackage')   
+    elif request.user.is_authenticated and request.user.is_superuser :
+        return redirect('dashboard')
+    else:       
+        return render(request,'index.html',context)
 
 
 #registration for normal user.
@@ -75,19 +223,21 @@ def loginPage(request):
 			password =request.POST.get('password')
 
 			user = authenticate(request, username=username, password=password)
+        
 
-			if user is not None:
-				login(request, user)
+			if user is not None:                
+				login(request, user)                
 				return redirect('index')
 			else:
 				messages.info(request, 'Username OR password is incorrect')
 
-		context = {}
-		return render(request, 'login.html', context)
+	context = {}
+	return render(request, 'login.html', context)
 
 
 def prod_detail(request,pk):
     produc = Product.objects.get(id=pk)
+    print(produc.image1,produc.image)
     cmp=Company.objects.all()
     context = { 'produc':produc,'cmp':cmp}
     return render(request,'prod_detail.html',context)
@@ -106,12 +256,42 @@ def addPackage(request):
         catlist=BudgetCategory.objects.filter(status=True)
         data=TypeCategory.objects.filter(status=True)
         cmp=Company.objects.all()
-        context = { 'cmp':cmp,'catlist':catlist,'data':data}
+        prov=Province.objects.all()
+        context = { 'cmp':cmp,'catlist':catlist,'data':data,'prov':prov}
         return render(request,'addPackages.html',context)
              
     else:
         return redirect('/login')
-
+def profile(request):
+    cmp=Company.objects.all()
+    sld=Slider.objects.all()
+    prov=Province.objects.all()
+    munic=Municipality.objects.all()
+    dist=District.objects.all()
+    profile=Customer.objects.get(user=request.user)
+    #print(profile)
+    if request.method=='POST':
+        name=request.POST['name']
+        email=request.POST['email']
+        mobile=request.POST['mobile']
+        gender=request.POST['gender']
+        muni=request.POST['muni']
+        province=request.POST['province']
+        district=request.POST['district']
+        country=request.POST['country']
+        province=Province.objects.get(id=province)
+        district=District.objects.get(id=district)
+        muni=Municipality.objects.get(id=muni)
+        if not Customer.objects.filter(user=request.user).exists():
+            Customer.objects.create(user=request.user,fullname=name,email=email,phone=mobile,country=country,province=province,district=district,muni=muni,gender=gender)
+            message="1"
+            return JsonResponse({'data':message})
+        else:
+            Customer.objects.filter(user=request.user).update(user=request.user,fullname=name,email=email,phone=mobile,country=country,province=province,district=district,muni=muni,gender=gender)
+            message="0"
+            return JsonResponse({'data':message})
+    context={'cmp':cmp,'sld':sld,'prov':prov,'dist':dist,'muni':munic,'profile':profile}
+    return render(request,'profile.html',context)
 def payment(request):
     return render(request,'payment.html')
 
@@ -137,7 +317,44 @@ def insertcategory(request):
             mess=2                             
         return JsonResponse({'mess':mess})
     return redirect('category1')
-
+def InsertPackage(request): 
+    print('Break Point 1')   
+    if request.method=='POST':       
+        action=request.POST['action']
+        img1=request.FILES.get('img1')#['fileList']
+        img2=request.FILES.get('img2')#['fileList']
+        img3=request.FILES.get('img3')#['fileList']
+        img4=request.FILES.get('img4')#['fileList']
+        thumbImg=request.FILES.get('thumbImg')#['thumbImg']             
+        pname=request.POST['pname']
+        price=request.POST['price']
+        desc=request.POST['desc']
+        nights=request.POST['nights']
+        days=request.POST['days']
+        overview=request.POST['overview']
+        packageType=request.POST['packageType']
+        province=request.POST['province']
+        district=request.POST['district']
+        muni=request.POST['muni']
+        catType=request.POST['catType']
+        inclusions=request.POST['inclusions']
+        exclusions=request.POST['exclusions']
+        itner=request.POST['itner']
+        vdate=request.POST['vdate']
+        discount=request.POST['discount']
+        author=request.user
+        location=request.POST['location']        
+        prov=Province.objects.get(id=province)
+        dist=District.objects.get(id=district)
+        muni=Municipality.objects.get(id=muni)
+        cat=TypeCategory.objects.get(id=catType)
+        bud=BudgetCategory.objects.get(id=packageType)
+        if(action == '1'):
+           Product.objects.create(name=pname,price=price,category=cat,budget=bud,image=thumbImg,description=desc,posted_by=author,inclusions=inclusions,exclusions=exclusions,Itnerary=itner,mapurl=location,days=days,nights=nights,province=prov,district=dist,muni=muni,valid_date=vdate,image1=img1,image2=img2,image3=img3,image4=img4,overview=overview)
+           status='Success'       
+           return JsonResponse({'status':status})
+    return redirect('addPackage')
+    
 
 def GetBudgetCategoryList(request):
     catlist=BudgetCategory.objects.filter(status=True)
@@ -153,8 +370,29 @@ def GetDetail(request):
         return HttpResponse(det, content_type="text/json-comment-filtered")       
         #return JsonResponse(deta)
 
+def saveRating(request):
+    if request.method=='POST':
+        prodid=request.POST['prodid']
+        rating=request.POST['rating']
+        user=request.user
+        prod=Product.objects.get(id=prodid)
+        if not Rating.objects.filter(item=prod,user=user).exists():
+            Rating.objects.create(item=prod,user=user,rating=rating)
+            return JsonResponse({'data':2})
+        else:
+            return JsonResponse({'data':1})
 
+def getdistrict(request):
+    if request.method=='POST':
+        provid=request.POST['pid']
+        dist=District.objects.filter(province=provid)
+        return JsonResponse({'dist':list(dist.values())}) 
 
+def getmuni(request):
+    if request.method=='POST':
+        mid=request.POST['mid']
+        muni=Municipality.objects.filter(district=mid)
+        return JsonResponse({'muni':list(muni.values())}) 
 #Category Type Views.... 
 
 def AddTypeCategory(request):
