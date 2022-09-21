@@ -9,7 +9,7 @@ urlpatterns = [
 	path('login/', views.loginPage, name="login"),  
 	path('logout/', views.logoutUser, name="logout"),
    
-   path('addPackage/', views.addPackage, name="addPackage"),     
+   path('addPackage', views.addPackage, name="addPackage"),     
    path('prod_detail/<str:pk>/', views.prod_detail, name="prod_detail"),
    
    path('dashboard',views.dashboard,name='dashboard'),
@@ -21,6 +21,11 @@ urlpatterns = [
    path('insertcategory/',views.insertcategory,name='insertcategory'),
    path('getBudgetList/',views.GetBudgetCategoryList,name='getBudgetList'),
    path('GetDetail/',views.GetDetail,name='GetDetail'),
+   path('DistrictList/',views.getdistrict,name='DistrictList'),
+   path('MuniList/',views.getmuni,name='MuniList'),
+   path('InsertPackage/',views.InsertPackage,name='InsertPackage'),
+   path('saveRating/',views.saveRating,name='saveRating'),
+   path('profile/',views.profile,name='profile'),
    
    #Category Type CRUD URLS..
    path('typecategory/',views.AddTypeCategory,name='typecategory'),
