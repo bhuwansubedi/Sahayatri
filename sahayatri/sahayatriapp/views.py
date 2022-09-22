@@ -253,15 +253,26 @@ def dashboard(request):
 
 def addPackage(request):
     if request.user.is_authenticated:
+        prod = Product.objects.filter(posted_by=request.user)
         catlist=BudgetCategory.objects.filter(status=True)
         data=TypeCategory.objects.filter(status=True)
         cmp=Company.objects.all()
         prov=Province.objects.all()
-        context = { 'cmp':cmp,'catlist':catlist,'data':data,'prov':prov}
+        context = { 'cmp':cmp,'catlist':catlist,'data':data,'prov':prov,'prod':prod}
         return render(request,'addPackages.html',context)
              
     else:
         return redirect('/login')
+
+def getPackageDetails(request):
+    if request.method=='POST':
+        p_id=request.POST['id']
+        print(p_id)
+        deta=Product.objects.filter(id=p_id)        
+        det = serializers.serialize('json', deta)
+        return HttpResponse(det, content_type="text/json-comment-filtered")
+
+
 def profile(request):
     cmp=Company.objects.all()
     sld=Slider.objects.all()
@@ -353,6 +364,7 @@ def InsertPackage(request):
            Product.objects.create(name=pname,price=price,category=cat,budget=bud,image=thumbImg,description=desc,posted_by=author,inclusions=inclusions,exclusions=exclusions,Itnerary=itner,mapurl=location,days=days,nights=nights,province=prov,district=dist,muni=muni,valid_date=vdate,image1=img1,image2=img2,image3=img3,image4=img4,overview=overview)
            status='Success'       
            return JsonResponse({'status':status})
+    
     return redirect('addPackage')
     
 
@@ -425,3 +437,4 @@ def DeleteCategoryType(request):
         id=request.POST['id']
         data = TypeCategory.objects.filter(id=id).delete()      
         return JsonResponse({'data':data})
+

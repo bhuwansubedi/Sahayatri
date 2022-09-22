@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path,include
 from sahayatriapp import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
    path('', views.index, name='index'),
@@ -11,6 +12,7 @@ urlpatterns = [
    
    path('addPackage', views.addPackage, name="addPackage"),     
    path('prod_detail/<str:pk>/', views.prod_detail, name="prod_detail"),
+   path('getPackageDetails/',views.getPackageDetails,name='getPackageDetails'),
    
    path('dashboard',views.dashboard,name='dashboard'),
    
@@ -32,4 +34,23 @@ urlpatterns = [
    path('getcategorytype/',views.GetCategoryType,name='getcategorytype'),
    path('categorytypedetail/',views.GetCategoryTypeDetail,name='categorytypedetail'),
    path('deletecategorytype/',views.DeleteCategoryType,name='deletecategorytype'),
+
+
+   #Password Reset URLS...
+
+   path('reset_password/',
+     auth_views.PasswordResetView.as_view(template_name="password_reset.html"),
+     name="reset_password"),
+
+   path('reset_password_sent/', 
+      auth_views.PasswordResetDoneView.as_view(template_name="password_reset_sent.html"), 
+      name="password_reset_done"),
+
+   path('reset/<uidb64>/<token>/',
+     auth_views.PasswordResetConfirmView.as_view(template_name="password_reset_form.html"), 
+     name="password_reset_confirm"),
+
+   path('reset_password_complete/', 
+      auth_views.PasswordResetCompleteView.as_view(template_name="password_reset_done.html"), 
+      name="password_reset_complete"),
 ]
