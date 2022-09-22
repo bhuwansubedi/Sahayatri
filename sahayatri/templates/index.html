@@ -9,6 +9,17 @@
 			min-width: 100%;
     		min-height: 100%;
 		}
+		.form-control {
+    padding: 10px 15px;
+    border-radius: 0;
+    height: 50px;
+    line-height: 50px;
+    background-color: #ffffff;
+    border-color: #ffffff;
+    width: 313px;
+    border-radius: 0.5pc;
+    margin-bottom: 21.200000000000003px;
+}
 	</style>
 	<!-- START PRELOADER -->
 	<div class="preloader">
@@ -59,12 +70,14 @@
 							<li><a href="#home">Home</a></li>
 							{% if request.user.is_authenticated %}
 							<li><a class="nav-link text-black font-weight-bold" href="{% url 'logout' %}">Logout</a>									
+							<li><a class="nav-link text-black font-weight-bold" href="{% url 'viewcart' %}"><i class="ti-shopping-cart"></i>
+								<span id="counter" class="badge badge-danger badge-counter">{{ count }}</span></a>									
 							<li><a class="nav-link text-black font-weight-bold" href="{% url 'profile' %}"><span>
 								<img src="https://cdn4.iconfinder.com/data/icons/small-n-flat/24/user-512.png" width="30" height="30" alt="">
 							</span>{{ request.user.username }}</a>									
 							{% else %}
 								<li><a href="{% url 'registerMerchant' %}">Register Merchant</a></li>
-								<li><a class="nav-link text-black font-weight-bold" href="{% url 'login' %}">Login</a></li>
+								<li><a class="nav-link text-black font-weight-bold" href="{% url 'login' %}">Login</a></li>								
 							{% endif %}	
 						</ul>
 					</nav>
@@ -92,7 +105,11 @@
 												<span>{{ s.alttext1 }}</span>
 												<h2>{{ s.alttext2 }}</h2>
 												<p class="lead">{{ s.alttext3 }}</p>
-												<a class="btn-home-border" href="#"><i class="ti-plus"></i> Get Started</a>								
+												<form method="post" action="{% url 'search' %}">
+													{% csrf_token %}
+												<input class="form-control mr-sm-2" name="searchvalue" type="search" placeholder="Search" aria-label="Search">
+												<button class="btn-home-border" type="submit" href="#"><i class="ti-search"></i> Search</button>
+												</form>								
 											</div>
 														
 										</div>
@@ -101,49 +118,7 @@
 							</div>
 						</div>
 					</div>
-					{% endfor %}
-					<!-- <div class="carousel-item">
-						<div class="single-slide-item" style="background-image: url(assets/img/slider/2.jpg);">
-							<div class="single-slide-item-table">
-								<div class="single-slide-item-tablecell">
-									<div class="container">
-										<div class="row align-items-center">
-											<div class="col-lg-12">
-												<span>Welcome To</span>
-												<h2>We Are Digital Creative Agency </h2>
-												<p class="lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam odio nisi, rhoncus non lacus quis, bibendum fringilla risus. Elementum justo viverra sodales</p>													
-												<a class="btn-home-border" href="#"><i class="ti-plus"></i> Get Started</a>
-												
-											</div>
-		
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div> -->
-					
-					<!-- <div class="carousel-item">
-						<div class="single-slide-item" style="background-image: url(assets/img/slider/3.jpg);">
-							<div class="single-slide-item-table">
-								<div class="single-slide-item-tablecell">
-									<div class="container">
-										<div class="row align-items-center">
-											<div class="col-lg-12">
-												<span>Welcome To</span>
-												<h2>We Provide Online Business Solution </h2>
-												<p class="lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam odio nisi, rhoncus non lacus quis, bibendum fringilla risus. Elementum justo viverra sodales</p>
-												
-												<a class="btn-home-border" href="#"><i class="ti-plus"></i> Get Started</a>
-
-											</div>
-												
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div> -->
+					{% endfor %}				
 					
 				</div>
 				
@@ -159,12 +134,57 @@
 	</section>
 	<!-- END  HOME DESIGN -->	
 
-	<!-- START FEATURE-->
-	
-
-
 	<!-- START BLOG -->		
 	<section id="blog" class="fresh-news section-padding">
+		<div class="container">		
+												
+			<div class="col-lg-12 text-center">
+				<div class="portfolio_filter">
+					<!-- {% csrf_token %} -->
+					<ul>
+						<li class="filter" ><a class="filter" href="{% url 'filter' 'All' %}">All</a></li>					
+						{% for c in cat %}
+						<li ><a class="filter"   href="{% url 'filter' c.id %}">{{ c.name }}</a></li>						
+						{% endfor %}
+					</ul>
+				</div>
+			</div>							
+		</div>
+		<div class="container">
+			<div class="section-title text-center wow zoomIn">
+				<span>{{ category }}</span>					
+			</div>					
+			<div class="row filt">	
+				{% for q in query %}				
+				<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
+					<div class="single_blog">
+						<div class="blog_img">
+							<a href="{% url 'prod_detail' q.id %}"><img src="{{ q.image.url }}" class="img-fluid pimage" alt="image" /></a>
+						</div>
+						<div class="blog_content">
+							<span class="blog_cat">
+								{% if request.user.is_authenticated %}
+								<a class="pushtolist" data-id="{{ q.id }}">Book</a>
+								{% endif %}
+								<!-- <a class="pushtolist" data-id="{{ q.id }}">Add to Bucketlist</a> -->
+								<a href="#">{{ q.nights }}N {{ q.days }} D</a>
+							</span>
+							<h3><a href="{% url 'prod_detail' q.id %}">{{ q.name }}</a></h3>								
+							<div class="blog-meta">
+								<span class="blog-author">
+									<img src="https://previews.123rf.com/images/martialred/martialred1708/martialred170800071/84363440-available-now-label-badge-seal-or-burst-flat-vector-icon-for-apps-and-websites.jpg" alt="author icon" /> 
+									<a href="#">NPR {{ q.price }}</a>
+								</span> 
+								<span class="blog-date">{{ q.valid_date | date:'d M Y' }}</span>								
+							</div>
+							<a href="{% url 'prod_detail' q.id %}" class="blog_btn"><i class="ti-arrow-right"></i></a>
+						</div>
+					</div>
+				</div><!-- END COL-->	
+				{% endfor %}
+																
+			</div><!-- END ROW -->
+		</div><!-- END CONTAINER -->
 		{% if request.user.is_authenticated %}
 		<div class="container">
 			<div class="section-title text-center wow zoomIn">
@@ -180,8 +200,8 @@
 						</div>
 						<div class="blog_content">
 							<span class="blog_cat">
-								<a href="#">Book</a>
-								<a href="#">Add to Bucketlist</a>
+								<a class="pushtolist" data-id="{{ q.id }}">Book</a>
+								<!-- <a class="pushtolist" data-id="{{ q.id }}">Add to Bucketlist</a> -->
 								<a href="#">{{ q.nights }}N {{ q.days }} D</a>
 							</span>
 							<h3><a href="{% url 'prod_detail' q.prod_id %}">{{ q.prod_name }}</a></h3>								
@@ -202,624 +222,36 @@
 		</div>
 		{% endif %}
 		
-		<div class="container">
-			<div class="section-title text-center wow zoomIn">
-				<span>Popular Destinations</span>	
-				<h2>Check out most popular <br /> tour packages </h2>
-			</div>				
-			<div class="row">	
-				{% for q in query %}				
-				<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="single_blog">
-						<div class="blog_img">
-							<a href="{% url 'prod_detail' q.id %}"><img src="{{ q.image.url }}" class="img-fluid pimage" alt="image" /></a>
-						</div>
-						<div class="blog_content">
-							<span class="blog_cat">
-								<a href="#">Book</a>
-								<a href="#">Add to Bucketlist</a>
-								<a href="#">{{ q.nights }}N {{ q.days }} D</a>
-							</span>
-							<h3><a href="{% url 'prod_detail' q.id %}">{{ q.name }}</a></h3>								
-							<div class="blog-meta">
-								<span class="blog-author">
-									<img src="https://previews.123rf.com/images/martialred/martialred1708/martialred170800071/84363440-available-now-label-badge-seal-or-burst-flat-vector-icon-for-apps-and-websites.jpg" alt="author icon" /> 
-									<a href="#">NPR {{ q.price }}</a>
-								</span> 
-								<span class="blog-date">{{ q.valid_date | date:'d M Y' }}</span>								
-							</div>
-							<a href="{% url 'prod_detail' q.id %}" class="blog_btn"><i class="ti-arrow-right"></i></a>
-						</div>
-					</div>
-				</div><!-- END COL-->	
-				{% endfor %}
-																
-			</div><!-- END ROW -->
-		</div><!-- END CONTAINER -->	
+			
 	</section>
 	<!-- END BLOG -->
 	<!-- END FEATURE -->		
 
-	<!-- START ABOUT US -->
-	<!-- <section class="about_us section-padding">
-		<div class="container">
-			<div class="row align-items-center">
-				<div class="col-lg-6 col-sm-12 col-xs-12">
-					<div class="about_img">
-						<img src="assets/img/about-img.jpg" alt="about image">		
-					</div>					
-				</div>
-				
-				<div class="col-lg-6 col-sm-12 col-xs-12">
-					<div class="about-content">						
-						<div class="section-title text-left">	
-							<span>About Us</span>								
-							<h2>Welcome To our <br>Digtal Agency </h2>	
-						</div>
-						
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed hendrerit, orci a euismod feugiat, orci odio semper justo, at varius lectus enim et est. Fusce tempor ex id est lobortis.</p>								
-						<ul>
-							<li><i class="ti-check"></i> Lorem ipsum dolor </li>
-							<li><i class="ti-check"></i> Lorem ipsum dolor </li>
-							<li><i class="ti-check"></i> Lorem ipsum dolor </li>
-							<li><i class="ti-check"></i> Lorem ipsum dolor </li>
-							<li><i class="ti-check"></i> Lorem ipsum dolor </li>
-						</ul>
-						<a href="#" class="btn-home-border">Read More</a>									
-					</div>
-				</div>										
-										
-			</div>	
-		</div>
-	</section> -->
-	<!-- END ABOUT US -->
-	
-	<!-- START COUNDOWN --> 
-	<!-- <section class="counter_feature">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
-					<div class="counter">				
-						<i class="ti-bag"></i>				
-						<div class="counter_content pull-left">
-							<h2 class="timer">2500</h2>  
-							<span>Projects Finished</span>
-						</div>
-					</div>
-				</div>  
-				
-				<div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
-					<div class="counter">				
-						<i class="ti-write"></i>				
-						<div class="counter_content pull-left">
-							<h2 class="timer">28253</h2>  
-							<span>Line Of Coding</span>
-						</div>
-					</div>
-				</div>  
-				
-				<div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.4s" data-wow-offset="0">
-					<div class="counter">				
-						<i class="ti-cup"></i>				
-						<div class="counter_content pull-left">
-							<h2 class="timer">1296</h2>  
-							<span>Award Won</span>
-						</div>
-					</div>
-				</div> 
-				
-				<div class="col-lg-3 col-sm-6 col-xs-12 wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.5s" data-wow-offset="0">
-					<div class="counter">				
-						<i class=" ti-user "></i>				
-						<div class="counter_content pull-left">
-							<h2 class="timer">2000</h2>  
-							<span>Satisfied Clients</span>
-						</div>
-					</div>
-				</div>                
-			</div>
-		</div>
-	</section> -->
-	<!-- END COUNDOWN -->
-	
-	<!-- START Skill -->
-	<!-- <section class="skill">
-		<div class="container">
-			<div class="section-title text-left wow zoomIn">
-				<div class="row">
-					<div class="col-lg-6">
-						<span>Skills</span>	
-						<h2>What is our Design <br> Skill Included</h2>
-					</div>
+<script>
+	console.log("{{ category }}")
+	// $('.cat').on('click',function(){
+	// 	var cat=$(this).val();
+	// 	var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+	// 	url="{% url 'index' %}"
+	// 	$.ajax({
+	// 		url:url,			
+	// 		dataType:'json',
+	// 		method:'post',
+	// 		data:{cat:cat},
+	// 		headers:{
+	// 			"X-CSRFToken": csrftoken
+	// 		},
+	// 		success:function(data){
+	// 			debugger;
+	// 			$('.filt').html(data)
 
-				</div>
-			</div>
-			
-			<div class="row">	
-				<div class="col-lg-6 col-sm-12 col-xs-12">
-					<div class="skill-img">
-						<img src="assets/img/skill-img.jpg" alt="skill image">
-					</div>				
-				</div>	
-				
-				<div class="col-lg-6 col-sm-12 col-xs-12">
-					<div class="progress-bar-linear">
-						<p class="progress-bar-text">Development</p>
-						<div class="progress-bar">
-							<span data-percent="85"></span>
-						</div>
-					</div>
-					
-					<div class="progress-bar-linear">
-						<p class="progress-bar-text">Cordignator</p>
-						<div class="progress-bar">
-							<span data-percent="95"></span>
-						</div>
-					</div>
+	// 		},
+	// 		error:function(data){
+	// 			toastr.warning("Cannot find the packages of this category");
+	// 		}
 
-					<div class="progress-bar-linear">
-						<p class="progress-bar-text">Web Design</p>
-						<div class="progress-bar">
-							<span data-percent="80"></span>
-						</div>
-					</div>	
-					
-					<div class="progress-bar-linear">
-						<p class="progress-bar-text">Laravel</p>
-						<div class="progress-bar">
-							<span data-percent="70"></span>
-						</div>
-					</div>						
-					
-					<div class="progress-bar-linear">
-						<p class="progress-bar-text">WordPress</p>
-						<div class="progress-bar">
-							<span data-percent="90"></span>
-						</div>
-					</div>													
-				</div>
-			</div>		
-		</div>
-	</section> -->
-	<!-- END Skill -->
-
-	<!-- START WHY CHOOSE US -->
-	<!-- <section class="why_choose_us section-padding">
-		<div class="container">
-			<div class="section-title text-center wow zoomIn">
-				<div class="row">
-					<div class="col-lg-12">
-						<span>Why Choose Us</span>	
-						<h2>Best Agency Choose<br> Clients Wise</h2>
-					</div>
-				</div>
-			</div>
-			
-			<div class="row">				
-				<div class="col-lg-7 col-sm-12 col-xs-12">
-					<div class="row">
-						<div class="col-lg-6 col-md-6 col-sm-12">
-							<div class="single_feature active_feature">
-								<div class="feat_icon"><i class="ti-mobile"></i></div>
-								<div class="single_f_content">
-									<h4>Responsive Design</h4>
-									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>	
-								</div>
-							</div>
-						</div>
-						
-						<div class="col-lg-6 col-md-6 col-sm-12">
-							<div class="single_feature">
-								<div class="feat_icon"><i class="ti-settings"></i></div>
-								<div class="single_f_content">
-									<h4>Easy Customizable </h4>
-									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>		
-								</div>
-							</div>
-						</div>
-						
-						<div class="col-lg-6 col-md-6 col-sm-12">
-							<div class="single_feature">
-								<div class="feat_icon"><i class="ti-headphone-alt "></i></div>
-								<div class="single_f_content">
-									<h4>Awesome Support</h4>
-									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>		
-								</div>
-							</div>
-						</div>
-
-						<div class="col-lg-6 col-md-6 col-sm-12">
-							<div class="single_feature">
-								<div class="feat_icon"><i class="ti-headphone-alt "></i></div>
-								<div class="single_f_content">
-									<h4>Awesome Support</h4>
-									<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>	
-								</div>
-							</div>
-						</div>	
-					
-					</div>	
-			
-				</div>
-				
-				<div class="col-lg-5 col-sm-12 col-xs-12"> 
-					<div class="feature_img">
-						<img src="assets/img/why-choose.jpg" class="img-responsive" alt="why choose image" />
-					</div>
-				</div>
-
-			</div>		
-		</div>		
-	</section> -->
-	<!-- END WHY CHOOSE US -->
-	
-	<!-- START SERVICE  -->
-	<!-- <section id="service" class="our_service section-padding gray-section">
-		<div class="container">					
-			<div class="section-title text-left wow zoomIn">
-				<div class="row">
-					<div class="col-lg-6">
-						<span>Our Services</span>	
-						<h2>We Provide Many Kind <br />Of Services</h2>
-					</div>
-	
-				</div>
-			</div>
-			
-			<div class="row text-center">	
-				<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="single_service">
-						<i class="ser_icon ti-paint-bucket color-1"></i>
-						<div class="ser_content">
-							<h4>Design & Development</h4>
-							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed hendrerit orci </p>
-						</div>
-					</div>
-				</div>
-				
-				<div class="col-lg-4 col-md-6 col-sm-12 wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="single_service">
-						<i class="ser_icon ti-bar-chart color-2"></i>
-						<div class="ser_content">
-							<h4>Digital Marketing</h4>
-							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed hendrerit orci </p>
-						</div>
-					</div>
-				</div>
-				
-				<div class="col-lg-4 col-md-6 col-sm-12 wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="single_service">
-						<i class="ser_icon ti-apple color-3"></i>
-						<div class="ser_content">
-							<h4>ISO App Development</h4>
-							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed hendrerit orci </p>
-						</div>
-					</div>
-				</div>
-				
-				<div class="col-lg-4 col-md-6 col-sm-12 wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="single_service">
-						<i class="ser_icon ti-paint-roller color-4"></i>
-						<div class="ser_content">
-							<h4>User Interface Design</h4>
-							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed hendrerit orci </p>
-						</div>
-					</div>
-				</div>
-				
-				<div class="col-lg-4 col-md-6 col-sm-12 wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="single_service">
-						<i class="ser_icon ti-shopping-cart-full color-5"></i>
-						<div class="ser_content">
-							<h4>eCommerce Solution</h4>
-							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed hendrerit orci </p>
-						</div>
-					</div>
-				</div>
-				
-				<div class="col-lg-4 col-md-6 col-sm-12 wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="single_service">
-						<i class="ser_icon ti-video-camera color-6"></i>
-						<div class="ser_content">
-							<h4>Your company Branding</h4>
-							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed hendrerit orci </p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section> -->
-	<!-- END SERVICE-->	
-
-	<!-- START VIDEO -->	
-	<!-- <section class="view_our_video" style="background-image: url(assets/img/bg/video-bg.jpg);  background-size:cover;background-position:center;background-attachment:fixed;">			
-		<div class="container">
-			<div class="row text-center">
-				<div class="col-lg-12">
-					<div class="our_video">
-						<h1>Lets Check our Business Overview</h1>
-						<p>Lorem Ipsum is simply dummy text of the printing </p>
-						<a class="video-play" href="https://vimeo.com/414300920"><i class="fa fa-play"></i></a>
-					</div>
-				</div>	
-			</div>
-		</div>			
-	</section> -->
-	<!-- END VIDEO -->			
-
-	<!-- START PORTFOLIO -->
-	<!-- <section id="portfolio" class="our_portfolio section-padding">
-		<div class="container">
-			<div class="section-title text-center wow zoomIn">
-				<span>Portfolios</span>	
-				<h2>Check out latest project  <br />done by us</h2>
-			</div>								
-			<div class="col-lg-12 text-center">
-				<div class="portfolio_filter">
-					<ul>
-						<li class="active filter" data-filter="all">All</li>
-						<li class="filter" data-filter=".branding">Branding</li>
-						<li class="filter" data-filter=".webtemplate">Web Template</li>
-						<li class="filter" data-filter=".seo">SEO</li>
-						<li class="filter" data-filter=".digital">Digital Marketing</li>
-					</ul>
-				</div>
-			</div>				
-			<div class="row portfolio_item">			
-				<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 mix webtemplate seo">						
-					<div class="box">
-						<img src="assets/img/portfolio/1.jpg" alt="">
-						<div class="box-content">
-							<h3 class="title"><a href="portfolio-details.html">App Landing</a></h3>
-							<span class="port-cat">Branding , Design</span>								
-							<a href="assets/img/portfolio/2.jpg" class="port-icon lightbox" data-gall="gall-work"><i class="ti-arrow-right"></i></a>							
-						</div>							
-					</div>
-				</div>
-				
-				<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 mix branding">				
-					<div class="box">
-						<img src="assets/img/portfolio/2.jpg" alt="">
-						<div class="box-content">
-							<h3 class="title"><a href="portfolio-details.html">Medical Concept</a></h3>
-							<span class="port-cat">Design , Development</span>								
-							<a href="assets/img/portfolio/2.jpg" class="port-icon lightbox" data-gall="gall-work"><i class="ti-arrow-right"></i></a>							
-						</div>
-					</div>
-				</div>
-				
-				<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 mix webtemplate digital">						
-					<div class="box">
-						<img src="assets/img/portfolio/3.jpg" alt="">
-						<div class="box-content">
-							<h3 class="title"><a href="portfolio-details.html">Increase Sale</a></h3>
-							<span class="port-cat">Marketing</span>								
-							<a href="assets/img/portfolio/2.jpg" class="port-icon lightbox" data-gall="gall-work"><i class="ti-arrow-right"></i></a>							
-						</div>				
-					</div>
-				</div>
-				
-				<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 mix digital seo">						
-					<div class="box">
-						<img src="assets/img/portfolio/4.jpg" alt="">
-						<div class="box-content">
-							<h3 class="title"><a href="portfolio-details.html">Marketing Page</a></h3>
-							<span class="port-cat">Marketing</span>								
-							<a href="assets/img/portfolio/2.jpg" class="port-icon lightbox" data-gall="gall-work"><i class="ti-arrow-right"></i></a>							
-						</div>	
-					</div>
-				</div>
-				
-				<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 mix branding digital">						
-					<div class="box">
-						<img src="assets/img/portfolio/5.jpg" alt="">								
-						<div class="box-content">
-							<h3 class="title"><a href="portfolio-details.html">Restaurant Design</a></h3>
-							<span class="port-cat">Product</span>								
-							<a href="assets/img/portfolio/2.jpg" class="port-icon lightbox" data-gall="gall-work"><i class="ti-arrow-right"></i></a>							
-						</div>								
-					</div>
-				</div>
-				
-				<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 mix webtemplate seo">				
-					<div class="box">
-						<img src="assets/img/portfolio/6.jpg" alt="">	
-						<div class="box-content">
-							<h3 class="title"><a href="portfolio-details.html">App Concept</a></h3>
-							<span class="port-cat">Product</span>								
-							<a href="assets/img/portfolio/2.jpg" class="port-icon lightbox" data-gall="gall-work"><i class="ti-arrow-right"></i></a>							
-						</div>	
-					</div>
-				</div>	
-				<div class="col-lg-12 col-sm-12 col-xs-12 text-center">							
-					<a class="btn-home-border" href="#">View More</a>						
-				</div>																
-			</div>
-		</div>
-	</section> -->
-	<!-- END PORTFOLIO -->	
-	
-	<!-- START TESTIMONIAL -->
-	<!-- <section class="testimonial-area section-padding">
-		<div class="container">												
-			<div class="section-title text-left wow zoomIn">
-				<span>People Opinions</span>	
-				<h2>What Client Says</h2>
-			</div>						
-			<div class="row">								
-				<div class="col-lg-12 col-sm-12 col-xs-12">
-					<div id="testimonial-slider" class="owl-carousel">
-						<div class="single_testimonial">
-							<div class="testi_img">
-								<i class="ti-quote-left"></i>
-								<img src="assets/img/testimonial/1.jpg" class="img-fluid" alt="" />			
-							</div>
-							<div class="test_content">	
-								<p>Nice view, very profesional and easy to implement in my website</p>							
-								<h3>Donald Grower</h3>
-								<span>Ceo</span>
-							</div>
-						</div>
-						
-						<div class="single_testimonial">
-							<div class="testi_img">
-								<i class="ti-quote-left"></i>
-								<img src="assets/img/testimonial/2.jpg" class="img-fluid" alt="" />			
-							</div>
-							<div class="test_content">	
-								<p>Excellent template and intuitive to configure. Perfect for a markting agency.</p>
-								<h3>Susan Sarandom</h3>
-								<span>Ceo</span>
-							</div>
-						</div>
-						
-						<div class="single_testimonial">
-							<div class="testi_img">
-								<i class="ti-quote-left"></i>
-								<img src="assets/img/testimonial/3.jpg" class="img-fluid" alt="" />
-							</div>	
-							<div class="test_content">
-								<p>Nice view, very profesional and easy to implement in my website</p>
-								<h3>Brian Whiterspoon</h3>
-								<span>Ceo</span>
-							</div>								
-						</div>
-						
-						<div class="single_testimonial">
-							<div class="testi_img">
-								<i class="ti-quote-left"></i>
-								<img src="assets/img/testimonial/1.jpg" class="img-fluid" alt="" />
-							</div>	
-							<div class="test_content">	
-								<p>Excellent template and intuitive to configure. Perfect for a markting agency</p>
-								<h3>Stefanie Highbrow</h3>
-								<span>Ceo</span>
-							</div>
-						</div>	
-						
-						<div class="single_testimonial">
-							<div class="testi_img">
-								<i class="ti-quote-left"></i>
-								<img src="assets/img/testimonial/2.jpg" class="img-fluid" alt="" />									
-							</div>	
-							<div class="test_content">	
-								<p>Nice view, very profesional and easy to implement in my website</p>
-								<h3>Susan Sarandom</h3>
-								<span>Ceo</span>
-							</div>								
-						</div>						
-					</div>  
-				</div>		  
-			</div>
-		</div>
-	</section> -->
-	<!-- END TESTIMONIAL -->
-
-	<!-- START PRICING  -->
-	<!-- <section id="pricing" class="our_pricing section-padding">
-		<div class="container">
-			<div class="section-title text-center wow zoomIn">
-				<span>Pricing</span>	
-				<h2>Check out our pricing <br>plan</h2>
-			</div>					
-			<div class="row">			
-				<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0">
-					<div class="pricingTable">
-						<div class="pricingTable-title">
-							<h3 class="title">Standard</h3>							
-						</div>
-						<ul class="pricing-content">
-							<li><i class="ti-check"></i> 15 website</li>
-							<li><i class="ti-check"></i> 15 Subdomains</li>
-							<li><i class="ti-check"></i> 20 Domains</li>
-							<li><i class="ti-check"></i> Unlimited Support</li>
-							<li><i class="ti-check"></i> <del>DNS Cluster Powered</del></li>
-							<li><i class="ti-check"></i> <del>SolusVM Control Panel Powered</del></li>
-						</ul>
-						<div class="pricingTable-value">
-							<h1 class="price-value">$30.00</h1>	
-							<span class="price-month">Per Month</span>	
-						</div>							
-						<a href="#" class="btn-home-border">Get your plan</a>							
-					</div>
-				</div>
-				
-				<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
-					<div class="pricingTable">
-						<div class="pricingTable-title">
-							<h3 class="title">Business</h3>
-						</div>
-						<ul class="pricing-content">
-							<li><i class="ti-check"></i> 20 website</li>
-							<li><i class="ti-check"></i> 20 Subdomains</li>
-							<li><i class="ti-check"></i> 35 Domains</li>
-							<li><i class="ti-check"></i> Unlimited Support</li>
-							<li><i class="ti-check"></i> DNS Cluster Powered</li>
-							<li><i class="ti-check"></i> <del>SolusVM Control Panel Powered</del></li>								
-						</ul>
-						<div class="pricingTable-value">
-							<h1 class="price-value">$60.00</h1>
-							<span class="price-month">Per Month</span>		
-						</div>								
-						<a href="#" class="btn-home-border">Get your plan</a>
-					</div>
-				</div>
-				
-				<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s" data-wow-offset="0">
-					<div class="pricingTable">
-						<div class="pricingTable-title">
-							<h3 class="title">Premium</h3>
-						</div>
-						<ul class="pricing-content">
-							<li><i class="ti-check"></i> 25 website</li>
-							<li><i class="ti-check"></i> 30 Subdomains</li>
-							<li><i class="ti-check"></i> 45 Domains</li>
-							<li><i class="ti-check"></i> Unlimited Support</li>
-							<li><i class="ti-check"></i> DNS Cluster Powered</li>
-							<li><i class="ti-check"></i> SolusVM Control Panel Powered</li>								
-						</ul>
-						<div class="pricingTable-value">
-							<h1 class="price-value">$90.00</h1>
-							<span class="price-month">Per Month</span>								
-						</div>								
-						<a href="#" class="btn-home-border">Get your plan</a>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section> -->
-	<!-- END PRICING -->		
-	<!-- START TEAM -->
-	<!-- END TEAM -->
-
-
-	
-
-	
-	
-
-	
-	
-	
-	
-	
-					
-		
-		<!-- STYLE SWITCHER -->
-		<!-- <div id="style-switcher">
-		<h2>Color Palette<a href="#"><i class="fas fa-cog fa-spin"></i></a></h2>
-		<div>
-			<ul class="colors" id="color1">
-			<li><a href="#" class="style1"></a></li>
-			<li><a href="#" class="style2"></a></li>
-			<li><a href="#" class="style3"></a></li>
-			<li><a href="#" class="style4"></a></li>
-			<li><a href="#" class="style5"></a></li>
-			<li><a href="#" class="style6"></a></li>
-			</ul>
-		</div>
-		</div>   -->
-		<!-- END OF STYLE SWITCHER -->	
-
+	// 	});
+	// });
+</script>
 {% endblock body %}
 		

@@ -91,7 +91,7 @@
 							</div> 	
 						</div>
 					</div>
-					
+					{% csrf_token %}
 					<div class="col-lg-8 col-md-6 col-sm-12 col-xs-12">
 						<div class="row">
 							<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
@@ -194,7 +194,70 @@
         <!-- switcher js -->				
         <script src="{% static 'assets/js/switcher.js' %}"></script>								
         <!-- scripts js -->
-        <script src="{% static 'assets/js/scripts.js' %}"></script>			
+        <script src="{% static 'assets/js/scripts.js' %}"></script>	
+		
+		<script>			
+			$('.pushtolist').on('click',function(){
+			var id=$(this).data('id');  
+			var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+			url="{% url 'addtocart' %}"  		
+			$.ajax({
+				url:url,
+				data:{id:id,action:'1'},
+				dataType:'json',
+				method:'post',
+				headers:{
+					"X-CSRFToken": csrftoken
+				},
+				success:function(data){
+					if(data.data=='fail'){
+						toastr.warning("Item Already Exists in the bucketlist");
+						
+					}
+					else{
+						toastr.success("Item Added to bucketlist succssfully!");
+						$('#counter').text(data.count);
+					}
+					
+
+				},
+				error:function(data){
+					toastr.warning("Unable to add to bucketlist!");
+				}
+			})    		
+			});
+			$('.bdelete').on('click',function(){
+				var id=$(this).data('id');
+				var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+				url="{% url 'addtocart' %}"  
+				$.ajax({
+				url:url,
+				data:{id:id,action:'del'},
+				dataType:'json',
+				method:'post',
+				headers:{
+					"X-CSRFToken": csrftoken
+				},
+				success:function(data){
+					if(data.data=='suc'){
+						location.reload();
+						
+					}
+					else{
+						toastr.error("Error while deleting the item!");
+						$('#counter').text(data.count);
+					}
+					
+
+				},
+				error:function(data){
+					toastr.warning("Unable to add to bucketlist!");
+				}
+			})    		
+
+			});
+		
+		</script>
 		<!-- <script src="{% static 'js/addpackage.js' %}"></script>	 -->
     </body>
 </html>
