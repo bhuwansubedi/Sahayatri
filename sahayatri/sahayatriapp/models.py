@@ -17,6 +17,7 @@ from xmlrpc.client import DateTime
 from django.db import models
 from django.contrib.auth.models import User,AbstractUser
 
+
 # Create your models here.
 
 class Company(models.Model):
@@ -183,4 +184,18 @@ class Rating(models.Model):
     item=models.ForeignKey(Product,related_name='prod_rate',on_delete=models.CASCADE)
     user=models.ForeignKey(User,related_name='rated_by',on_delete=models.CASCADE)
     rating=models.IntegerField(default=0,null=True)
+
+class Bucketlist(models.Model):
+    item=models.ForeignKey(Product,on_delete=models.CASCADE)
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    date_created = models.DateTimeField(auto_now_add=True,null=True)
+    
+class Order(models.Model):
+    item=models.ForeignKey(Product,on_delete=models.CASCADE)
+    total=models.PositiveIntegerField()
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    date_created = models.DateTimeField(auto_now_add=True,null=True)
+    payment=models.CharField(max_length=100,null=True)
+    
+
 
