@@ -6,12 +6,13 @@ from email.mime import image
 from fileinput import filename
 from hashlib import new
 import imp
-from itertools import count
+from itertools import count, product
 import json
-from math import dist
+from math import dist, prod
 from pickle import NONE
-from unicodedata import name
+from unicodedata import category, name
 from urllib import request
+from urllib.robotparser import RequestRate
 from xmlrpc.client import DateTime
 from django.db import models
 from django.http.response import JsonResponse
@@ -19,10 +20,10 @@ from django.shortcuts import render,HttpResponse,redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .forms import AddCategoryForm1, CreateUserForm,AddPackageForm
+from .forms import CreateUserForm
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
-from sahayatriapp.models import BudgetCategory, Company, Rating,Slider,TypeCategory,Product,District,Municipality,Province,Customer
+from sahayatriapp.models import BudgetCategory, Bucketlist,Company, Order,Rating,Slider,TypeCategory,Product,District,Municipality,Province,Customer
 from sahayatriapp.models import Product
 from django.core import serializers
 from math import sqrt
@@ -32,10 +33,11 @@ from scipy import sparse
 from sklearn.metrics.pairwise import cosine_similarity
 import random
 import warnings
-warnings.filterwarnings('ignore')
+
+from django.template.loader import render_to_string
 import csv
 from django.contrib.auth.models import User
-
+warnings.filterwarnings('ignore')
 # Create your views here.
 def standardize(row):
     new_row = (row - row.mean()) / (row.max() - row.min())
@@ -164,13 +166,16 @@ def index(request):
     generic_list=Product.objects.all()    
     cmp=Company.objects.all()
     sld=Slider.objects.all()
-    context={'query':generic_list,'cmp':cmp,'sld':sld,'recomlist':recommended}
+    cat=TypeCategory.objects.all()     
     if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
-        return redirect('addPackage')   
+        return redirect('addPackage')
     elif request.user.is_authenticated and request.user.is_superuser :
         return redirect('dashboard')
-    else:       
-        return render(request,'index.html',context)
+    else:    
+        count=Bucketlist.objects.filter(user=request.user).count()    
+        category='All'
+        context={'query':generic_list,'cmp':cmp,'sld':sld,'recomlist':recommended,'cat':cat,'category':category,'count':count}           
+        return render(request,'index.html',context)        
 
 
 #registration for normal user.
@@ -191,6 +196,22 @@ def registerUserPage(request):
                 return redirect('login')
         context = {'form':form}
         return render(request, 'registerUser.html', context)
+
+def addtocart(request):
+    if request.method=='POST':
+        prodid=request.POST['id']
+        action=request.POST['action']
+        if action=='del':
+            Bucketlist.objects.get(id=prodid).delete()
+            return JsonResponse({'data':'suc'})        
+        product=Product.objects.get(id=prodid)
+        if not Bucketlist.objects.filter(user=request.user,item=product).exists():
+            Bucketlist.objects.create(item=product,user=request.user) 
+            count=Bucketlist.objects.filter(user=request.user).count()
+            print(count)           
+            return JsonResponse({'data':count})
+        else:            
+            return JsonResponse({'data':'fail'})
 
 
 #registration for merchant.
@@ -236,12 +257,46 @@ def loginPage(request):
 
 
 def prod_detail(request,pk):
-    produc = Product.objects.get(id=pk)
-    print(produc.image1,produc.image)
+    produc = Product.objects.get(id=pk)    
     cmp=Company.objects.all()
     context = { 'produc':produc,'cmp':cmp}
     return render(request,'prod_detail.html',context)
 
+def search(request):
+    recommended= read_rating_cs(request)           
+    generic_list=Product.objects.all()    
+    cmp=Company.objects.all()
+    sld=Slider.objects.all()
+    cat=TypeCategory.objects.all() 
+    if request.method=='POST':
+        key=request.POST['searchvalue']
+        search_list=Product.objects.filter(name__contains=key)
+        category='Search Results for '+key
+        context={'query':search_list,'cmp':cmp,'sld':sld,'recomlist':recommended,'cat':cat,'category':category}
+        return render(request,'index.html',context) 
+    
+
+
+def filter(request,pk):
+    recommended= read_rating_cs(request)           
+    generic_list=Product.objects.all()    
+    cmp=Company.objects.all()
+    sld=Slider.objects.all()
+    cat=TypeCategory.objects.all()     
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
+        return redirect('addPackage')
+    elif request.user.is_authenticated and request.user.is_superuser :
+        return redirect('dashboard')
+    else:                       
+        if pk=='All':
+            category='All'
+            context={'query':generic_list,'cmp':cmp,'sld':sld,'recomlist':recommended,'cat':cat,'category':category}
+            return render(request,'index.html',context)        
+        else:
+            catobj=TypeCategory.objects.get(id=pk)                       
+            filter=Product.objects.filter(category=catobj)
+            context={'query':filter,'cmp':cmp,'sld':sld,'recomlist':recommended,'cat':cat,'category':catobj.name}                 
+            return render(request,'index.html',context)       
 
 def logoutUser(request):
 	logout(request)
@@ -249,6 +304,22 @@ def logoutUser(request):
 
 def dashboard(request):
     return render(request,'admin.html')
+
+def viewcart(request):
+    prov=Province.objects.all()
+    munic=Municipality.objects.all()
+    dist=District.objects.all() 
+    cmp=Company.objects.all()
+    sld=Slider.objects.all()
+    count=Bucketlist.objects.filter(user=request.user).count() 
+    total=Bucketlist.objects.filter(user=request.user)
+    tot=0
+    for t in total:
+        tot=tot+int(t.item.price) 
+    profile=Customer.objects.get(user=request.user)
+    blist=Bucketlist.objects.filter(user=request.user)
+    context={'cmp':cmp,'sld':sld,'prov':prov,'dist':dist,'muni':munic,'blist':blist,'profile':profile,'total':tot,'count':count}
+    return render(request,'cart.html',context)
     
 
 def addPackage(request):
@@ -278,8 +349,11 @@ def profile(request):
     sld=Slider.objects.all()
     prov=Province.objects.all()
     munic=Municipality.objects.all()
-    dist=District.objects.all()
-    profile=Customer.objects.get(user=request.user)
+    dist=District.objects.all()    
+    if Customer.objects.filter(user=request.user).exists():
+        profile=Customer.objects.get(user=request.user)
+    else:
+        profile=0            
     #print(profile)
     if request.method=='POST':
         name=request.POST['name']
@@ -304,6 +378,25 @@ def profile(request):
     context={'cmp':cmp,'sld':sld,'prov':prov,'dist':dist,'muni':munic,'profile':profile}
     return render(request,'profile.html',context)
 def payment(request):
+    if request.method=='POST':
+        id=request.POST['id']
+        total=request.POST['total']
+        pay=request.POST['pay']  
+        print(id,total,pay)      
+        bl=Bucketlist.objects.get(id=id)
+        prod=Product.objects.get(id=bl.item.id)
+        if not Order.objects.filter(item=prod,user=request.user).exists():
+            Order.objects.create(item=prod,user=request.user,payment=pay,total=total)
+            if Order.objects.filter(item=prod,user=request.user).exists():
+                Bucketlist.objects.filter(id=id).delete()            
+                order=Order.objects.get(user=request.user)
+                if pay=='esewa':
+                    return render(request,'payment.html',{'order':order})
+                else:
+                    return redirect('index')
+
+
+
     return render(request,'payment.html')
 
 def category1(request):
@@ -328,8 +421,7 @@ def insertcategory(request):
             mess=2                             
         return JsonResponse({'mess':mess})
     return redirect('category1')
-def InsertPackage(request): 
-    print('Break Point 1')   
+def InsertPackage(request):  
     if request.method=='POST':       
         action=request.POST['action']
         img1=request.FILES.get('img1')#['fileList']
@@ -392,7 +484,9 @@ def saveRating(request):
             Rating.objects.create(item=prod,user=user,rating=rating)
             return JsonResponse({'data':2})
         else:
-            return JsonResponse({'data':1})
+            Rating.objects.filter(item=prod,user=user).update(item=prod,user=user,rating=rating) 
+            return JsonResponse({'data':2})
+        
 
 def getdistrict(request):
     if request.method=='POST':

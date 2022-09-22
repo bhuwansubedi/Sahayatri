@@ -12,6 +12,10 @@ urlpatterns = [
    
    path('addPackage', views.addPackage, name="addPackage"),     
    path('prod_detail/<str:pk>/', views.prod_detail, name="prod_detail"),
+   path('filter/<str:pk>/', views.filter, name="filter"),
+   path('search', views.search, name="search"),
+   path('addtocart', views.addtocart, name="addtocart"),
+   path('viewcart', views.viewcart, name="viewcart"),
    path('getPackageDetails/',views.getPackageDetails,name='getPackageDetails'),
    
    path('dashboard',views.dashboard,name='dashboard'),
@@ -28,6 +32,7 @@ urlpatterns = [
    path('InsertPackage/',views.InsertPackage,name='InsertPackage'),
    path('saveRating/',views.saveRating,name='saveRating'),
    path('profile/',views.profile,name='profile'),
+
    
    #Category Type CRUD URLS..
    path('typecategory/',views.AddTypeCategory,name='typecategory'),

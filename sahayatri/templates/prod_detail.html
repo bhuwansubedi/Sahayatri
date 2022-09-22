@@ -54,6 +54,10 @@
   left: 50%;
   transform: translateX(-50%);
 }
+.book{
+  margin-right: 31px;
+}
+
 
 .wrapper input {
   border: 0;
@@ -156,6 +160,7 @@
             <div class="single-portfolio"><img src="{{ produc.image3.url }}" alt="slider image" /></div>
             <div class="single-portfolio"><img src="{{ produc.image4.url }}" alt="slider image" /></div>            		
           </div>
+          
         </div><!-- END  Col -->	
         
         <div class="col-lg-6 col-md-12 col-xs-12">
@@ -165,18 +170,24 @@
               <p><strong><i class="ti-user"></i> {{ produc.posted_by }}</strong> <br /> </p>
               <p><strong><i class="ti-folder"></i> {{ produc.category }}</strong> <br /> </p>
               <p><strong><i class="ti-timer"></i>  {{ produc.days }}D /{{ produc.nights }} N</strong><br /> </p>
-              <p><strong><i class="ti-tag"></i>  NPR {{ produc.price }}</strong> <br /> </p>              
+              <p><strong><i class="ti-tag"></i>  NPR {{ produc.price }}</strong> <br /> </p>  
+              <div class="row">
+                {% if request.user.is_authenticated %}
+                <button class="btn-home-border book pushtolist"  aria-label="Previous" data-id="{{ produc.id }}" type="button" >Book</button>
+                {% endif %}
+              <!-- <button class="btn-home-border pushtolist" aria-label="Previous" id="pushtolist" data-id="{{ produc.id }}" type="button" >Add to Bucketlist</button>     -->
+              </div>        
             </div>
            
             
           </div>
           
-        </div>
+        </div>        
         {% if request.user.is_authenticated  %}
         <form action="">
-          {% csrf_token %}
+          {% csrf_token %}          
           <div class="wrapper star">
-          
+            
             <input type="checkbox" class="rate" id="st1" value="5" />
             <label for="st1"></label>
             <input type="checkbox" class="rate" id="st2" value="4" />
@@ -188,7 +199,7 @@
             <input type="checkbox" class="rate" id="st5" value="1" />
             <label for="st5"></label>
             
-          </div>
+          </div>         
         </form>
         {% endif %}
         
@@ -231,7 +242,7 @@
       </div>
     </div>
   </section><!-- END portfolio-details -->	
-  <script type="text/javascript"> 
+  <script type="text/javascript">     
     var itner = "{{ produc.Itnerary }}";     
     var html=$.parseHTML(itner);
     var itner=document.getElementById('itnerary');
@@ -279,7 +290,6 @@
         "X-CSRFToken": csrftoken
           },
           success:function(data){
-            debugger;
             if(data.data==2){
               toastr.success("Rating Saved Successfully!");
             }
@@ -296,5 +306,5 @@
     });
 
  </script>
-
+ 
 {% endblock body %}
