@@ -9,6 +9,7 @@ import imp
 from itertools import count, product
 import json
 from math import dist, prod
+from multiprocessing import context
 from pickle import NONE
 from unicodedata import category, name
 from urllib import request
@@ -23,7 +24,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import CreateUserForm
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
-from sahayatriapp.models import BudgetCategory, Bucketlist,Company, Order,Rating,Slider,TypeCategory,Product,District,Municipality,Province,Customer
+from sahayatriapp.models import BudgetCategory, Bucketlist,Company, Merchant, Order,Rating,Slider,TypeCategory,Product,District,Municipality,Province,Customer
 from sahayatriapp.models import Product
 from django.core import serializers
 from math import sqrt
@@ -33,6 +34,7 @@ from scipy import sparse
 from sklearn.metrics.pairwise import cosine_similarity
 import random
 import warnings
+from django.db.models import Avg,Sum
 
 from django.template.loader import render_to_string
 import csv
@@ -168,7 +170,7 @@ def index(request):
     sld=Slider.objects.all()
     cat=TypeCategory.objects.all()     
     if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
-        return redirect('addPackage')
+        return redirect('merchant')
     elif request.user.is_authenticated and request.user.is_superuser :
         return redirect('dashboard')
     else:
@@ -202,6 +204,93 @@ def registerUserPage(request):
         context = {'form':form}
         return render(request, 'registerUser.html', context)
 
+def merchant(request):    
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':  
+        blist=Bucketlist.objects.filter(posted_by=request.user.id)             
+        bcount=blist.count()        
+        prodlist=Product.objects.filter(posted_by=request.user)                
+        for p in prodlist:            
+            tot=Rating.objects.filter(item=p).aggregate(Avg('rating'))  
+            rtval=list(tot.values())            
+            format_float = round(rtval[0],2)                 
+            # p.avg_rating=("{0:.3f}".format(tot))
+            # print(p.avg)
+            # print(p.avg_rating)
+            Product.objects.filter(id=p.id).update(avg_rating=format_float)
+        prod_list=Product.objects.filter(posted_by=request.user)
+        avrating=prod_list.aggregate(Avg('avg_rating'))
+        rtaval=list(avrating.values())            
+        avg_rating = round(rtaval[0],2)
+       # print(prod_list.avg_rating)        
+        prod_count=prod_list.count()   
+        order_list=Order.objects.filter(user=request.user)
+        order_count=order_list.count()        
+        total_order_value=0
+        for t in order_list:
+            total_order_value=total_order_value + t.total                
+        context={'blist':blist,'bcount':bcount,'prod_list':prod_list,'prod_count':prod_count,'order_list':order_list,
+        'order_count':order_count,'tov':total_order_value,'avg_rating':avg_rating}
+        return render(request,'admin.html',context)
+
+def booking_list(request):
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
+        b_list=Bucketlist.objects.filter(posted_by=request.user.id)        
+        context={'blist':b_list}
+        return render(request,'bookinglist.html',context)
+
+def export_excel(request):
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
+        b_list=Bucketlist.objects.filter(posted_by=request.user.id)                
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="Booking List.csv"'        
+        writer = csv.writer(response)
+        writer.writerow(['Booking List'])       
+        writer.writerow(['Name','Price','Booked By'])
+        for b in b_list:
+            writer.writerow([b.item.name,b.item.price,b.user.username])
+
+    return response
+
+def export_excel_package(request):
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
+        b_list=Product.objects.filter(posted_by=request.user)                
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="Package_List.csv"'        
+        writer = csv.writer(response)
+        writer.writerow(['Package List'])       
+        writer.writerow(['Name','Price','Duration','Valid Date'])
+        for b in b_list:
+            writer.writerow([b.name,b.price,str(b.days) +' Days '+ str(b.nights)+' Nights',b.valid_date])
+
+    return response
+
+def merchprofile(request):
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
+        if not Merchant.objects.filter(user=request.user).exists():
+            context={}
+        else:
+            merch=Merchant.objects.filter(user=request.user)
+            print(merch)
+            context={'merch':merch}
+        return render(request,'merchprofile.html',context)
+def createmerchprofile(request):
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
+        if request.method=='POST':
+            fullname=request.POST['cname']
+            address=request.POST['caddres']
+            pan=request.POST['pan']
+            redgno=request.POST['redgno']
+            email=request.POST['email']
+            phone=request.POST['phone']
+            if not Merchant.objects.filter(user=request.user).exists():               
+                Merchant.objects.create(user=request.user,fullname=fullname,country=address,pan_no=pan,email=email,phone=phone,company_website=redgno)
+                merch=Merchant.objects.filter(user=request.user)                
+                return render(request,'merchprofile.html',{'merch':merch})
+            else:
+                Merchant.objects.filter(user=request.user).update(user=request.user,fullname=fullname,country=address,pan_no=pan,email=email,phone=phone,company_website=redgno)
+                merch=Merchant.objects.filter(user=request.user)
+                return render(request,'merchprofile.html',{'merch':merch})
+
 def addtocart(request):
     if request.method=='POST':
         prodid=request.POST['id']
@@ -211,7 +300,7 @@ def addtocart(request):
             return JsonResponse({'data':'suc'})        
         product=Product.objects.get(id=prodid)
         if not Bucketlist.objects.filter(user=request.user,item=product).exists():
-            Bucketlist.objects.create(item=product,user=request.user) 
+            Bucketlist.objects.create(item=product,user=request.user,posted_by=product.posted_by.id) 
             count=Bucketlist.objects.filter(user=request.user).count()
             print(count)           
             return JsonResponse({'data':count})
@@ -350,7 +439,9 @@ def viewcart(request):
     tot=0
     for t in total:
         tot=tot+int(t.item.price) 
-    profile=Customer.objects.get(user=request.user)
+    profile=0
+    if Customer.objects.filter(user=request.user).exists():
+        profile=Customer.objects.get(user=request.user)
     blist=Bucketlist.objects.filter(user=request.user)
     context={'cmp':cmp,'sld':sld,'prov':prov,'dist':dist,'muni':munic,'blist':blist,'profile':profile,'total':tot,'count':count}
     return render(request,'cart.html',context)
@@ -359,7 +450,7 @@ def viewcart(request):
 
 
 def addPackage(request):
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
         prod = Product.objects.filter(posted_by=request.user)
         catlist=BudgetCategory.objects.filter(status=True)
         data=TypeCategory.objects.filter(status=True)
@@ -367,7 +458,10 @@ def addPackage(request):
         prov=Province.objects.all()
         context = { 'cmp':cmp,'catlist':catlist,'data':data,'prov':prov,'prod':prod}
         return render(request,'addPackages.html',context)
-             
+    elif request.user.is_authenticated and request.user.is_superuser :
+        return redirect('admin:index')
+    elif request.user.is_authenticated:
+        return redirect('index')             
     else:
         return redirect('/login')
 
@@ -533,6 +627,13 @@ def GetBudgetCategoryList(request):
     #data=serializers.serialize('json',catlist)
     return JsonResponse({'catlist': list(catlist.values())})
 
+def getbookingdetail(request):
+    if request.method=='POST':
+        bid=request.POST['bid']
+        b_list=Bucketlist.objects.filter(id=bid)
+        print(b_list)
+        det = serializers.serialize('json', b_list)
+        return HttpResponse(det, content_type="text/json-comment-filtered")
 
 def GetDetail(request):
     if request.method=='POST':

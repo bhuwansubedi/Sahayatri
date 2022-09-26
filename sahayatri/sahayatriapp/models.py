@@ -95,6 +95,7 @@ class Product(models.Model):
     image2=models.ImageField(upload_to='media',null=True)
     image3=models.ImageField(upload_to='media',null=True)
     image4=models.ImageField(upload_to='media',null=True)
+    avg_rating=models.DecimalField(null=True,max_digits=3,decimal_places=2)
 
     def __str__(self):
         return self.name
@@ -104,6 +105,7 @@ class Product(models.Model):
 class Merchant(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE,null=True)
+    email=models.CharField(max_length=100,null=True)
     fullname=models.CharField(max_length=100,null=True)
     phone = models.CharField(max_length=200,null=True)
     type_of_user = models.CharField(max_length=200,null=True)
@@ -116,11 +118,11 @@ class Merchant(models.Model):
     gender = models.CharField(max_length=200,null=True)
     pan_no = models.CharField(max_length=200,null=True)
     company_name = models.CharField(max_length=200,null=True)
-    company_website = models.CharField(max_length=200,null=True)
+    company_website = models.URLField(max_length=200,null=True)
     status=models.BooleanField(default=False)
 
     def __str__(self):
-        return self.username
+        return self.fullname
 
 
 class Customer(models.Model):    
@@ -189,6 +191,7 @@ class Bucketlist(models.Model):
     item=models.ForeignKey(Product,on_delete=models.CASCADE)
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True,null=True)
+    posted_by=models.IntegerField(null=True)
     
 class Order(models.Model):
     item=models.ForeignKey(Product,on_delete=models.CASCADE)
@@ -196,6 +199,7 @@ class Order(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True,null=True)
     payment=models.CharField(max_length=100,null=True)
+    posted_by=models.IntegerField( null=True)
     
 
 
