@@ -9,6 +9,7 @@ import imp
 from itertools import count, product
 import json
 from math import dist, prod
+from multiprocessing import context
 from pickle import NONE
 from unicodedata import category, name
 from urllib import request
@@ -33,6 +34,7 @@ from scipy import sparse
 from sklearn.metrics.pairwise import cosine_similarity
 import random
 import warnings
+from django.db.models import Avg,Sum
 
 from django.template.loader import render_to_string
 import csv
@@ -168,11 +170,13 @@ def index(request):
     sld=Slider.objects.all()
     cat=TypeCategory.objects.all()     
     if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
-        return redirect('addPackage')
+        return redirect('merchant')
     elif request.user.is_authenticated and request.user.is_superuser :
-        return redirect('dashboard')
-    else:    
-        count=Bucketlist.objects.filter(user=request.user).count()    
+        return redirect('admin:index')
+    else: 
+        count=0  
+        if request.user.is_authenticated:
+            count=Bucketlist.objects.filter(user=request.user).count()    
         category='All'
         context={'query':generic_list,'cmp':cmp,'sld':sld,'recomlist':recommended,'cat':cat,'category':category,'count':count}           
         return render(request,'index.html',context)        
@@ -197,6 +201,42 @@ def registerUserPage(request):
         context = {'form':form}
         return render(request, 'registerUser.html', context)
 
+def merchant(request):    
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':  
+        blist=Bucketlist.objects.filter(posted_by=request.user.id)             
+        bcount=blist.count()        
+        prodlist=Product.objects.filter(posted_by=request.user)                
+        for p in prodlist:            
+            tot=Rating.objects.filter(item=p).aggregate(Avg('rating'))  
+            rtval=list(tot.values())            
+            format_float = round(rtval[0],2)                 
+            # p.avg_rating=("{0:.3f}".format(tot))
+            # print(p.avg)
+            # print(p.avg_rating)
+            Product.objects.filter(id=p.id).update(avg_rating=format_float)
+        prod_list=Product.objects.filter(posted_by=request.user)
+        avrating=prod_list.aggregate(Avg('avg_rating'))
+        rtaval=list(avrating.values())            
+        avg_rating = round(rtaval[0],2)
+       # print(prod_list.avg_rating)        
+        prod_count=prod_list.count()   
+        order_list=Order.objects.filter(user=request.user)
+        order_count=order_list.count()        
+        total_order_value=0
+        for t in order_list:
+            total_order_value=total_order_value + t.total                
+        context={'blist':blist,'bcount':bcount,'prod_list':prod_list,'prod_count':prod_count,'order_list':order_list,
+        'order_count':order_count,'tov':total_order_value,'avg_rating':avg_rating}
+        return render(request,'admin.html',context)
+
+def booking_list(request):
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
+        b_list=Bucketlist.objects.filter(posted_by=request.user.id)
+        print (b_list.values_list)
+        context={'blist':b_list}
+        return render(request,'bookinglist.html',context)
+
+
 def addtocart(request):
     if request.method=='POST':
         prodid=request.POST['id']
@@ -206,7 +246,7 @@ def addtocart(request):
             return JsonResponse({'data':'suc'})        
         product=Product.objects.get(id=prodid)
         if not Bucketlist.objects.filter(user=request.user,item=product).exists():
-            Bucketlist.objects.create(item=product,user=request.user) 
+            Bucketlist.objects.create(item=product,user=request.user,posted_by=product.posted_by.id) 
             count=Bucketlist.objects.filter(user=request.user).count()
             print(count)           
             return JsonResponse({'data':count})
@@ -316,23 +356,30 @@ def viewcart(request):
     tot=0
     for t in total:
         tot=tot+int(t.item.price) 
-    profile=Customer.objects.get(user=request.user)
+    profile=0
+    if Customer.objects.filter(user=request.user).exists():
+        profile=Customer.objects.get(user=request.user)
     blist=Bucketlist.objects.filter(user=request.user)
     context={'cmp':cmp,'sld':sld,'prov':prov,'dist':dist,'muni':munic,'blist':blist,'profile':profile,'total':tot,'count':count}
     return render(request,'cart.html',context)
     
 
 def addPackage(request):
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
         catlist=BudgetCategory.objects.filter(status=True)
         data=TypeCategory.objects.filter(status=True)
         cmp=Company.objects.all()
         prov=Province.objects.all()
         context = { 'cmp':cmp,'catlist':catlist,'data':data,'prov':prov}
         return render(request,'addPackages.html',context)
-             
+    elif request.user.is_authenticated and request.user.is_superuser :
+        return redirect('admin:index')
+    elif request.user.is_authenticated:
+        return redirect('index')             
     else:
         return redirect('/login')
+
+
 def profile(request):
     cmp=Company.objects.all()
     sld=Slider.objects.all()

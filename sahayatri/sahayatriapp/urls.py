@@ -12,9 +12,11 @@ urlpatterns = [
    path('addPackage', views.addPackage, name="addPackage"),     
    path('prod_detail/<str:pk>/', views.prod_detail, name="prod_detail"),
    path('filter/<str:pk>/', views.filter, name="filter"),
+   path('booking_list', views.booking_list, name="booking_list"),
    path('search', views.search, name="search"),
    path('addtocart', views.addtocart, name="addtocart"),
    path('viewcart', views.viewcart, name="viewcart"),
+   path('merchant', views.merchant, name="merchant"),
    
    path('dashboard',views.dashboard,name='dashboard'),
    
