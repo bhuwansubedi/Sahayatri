@@ -15,12 +15,15 @@ urlpatterns = [
    path('filter/<str:pk>/', views.filter, name="filter"),
    path('search', views.search, name="search"),
    path('addtocart', views.addtocart, name="addtocart"),
-   path('viewcart', views.viewcart, name="viewcart"),
+   path('viewcart/', views.viewcart, name="viewcart"),
    path('getPackageDetails/',views.getPackageDetails,name='getPackageDetails'),
    
    path('dashboard',views.dashboard,name='dashboard'),
    
-   path('payment',views.payment,name='payment'),
+   path('payment/',views.payment,name='payment'),
+   path('esewaPortal/<str:pk>/',views.esewaPortal,name="esewaPortal"),
+
+   path('esewa-verify',views.esewaVerify,name="esewaVerify"),
    
    path('category1',views.category1,name='category1'),
    path('category2',views.category2,name='category2'),

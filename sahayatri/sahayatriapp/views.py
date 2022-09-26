@@ -171,10 +171,15 @@ def index(request):
         return redirect('addPackage')
     elif request.user.is_authenticated and request.user.is_superuser :
         return redirect('dashboard')
-    else:    
-        count=Bucketlist.objects.filter(user=request.user).count()    
-        category='All'
-        context={'query':generic_list,'cmp':cmp,'sld':sld,'recomlist':recommended,'cat':cat,'category':category,'count':count}           
+    else:
+        if request.user.is_authenticated:    
+            count=Bucketlist.objects.filter(user=request.user).count() 
+            category='All'
+            context={'query':generic_list,'cmp':cmp,'sld':sld,'recomlist':recommended,'cat':cat,'category':category,'count':count}
+        else:
+            #count=Bucketlist.objects.filter(user=request.user).count() 
+            category='All'
+            context={'query':generic_list,'cmp':cmp,'sld':sld,'recomlist':recommended,'cat':cat,'category':category}
         return render(request,'index.html',context)        
 
 
@@ -256,11 +261,14 @@ def loginPage(request):
 	return render(request, 'login.html', context)
 
 
+
 def prod_detail(request,pk):
     produc = Product.objects.get(id=pk)    
     cmp=Company.objects.all()
     context = { 'produc':produc,'cmp':cmp}
     return render(request,'prod_detail.html',context)
+
+
 
 def search(request):
     recommended= read_rating_cs(request)           
@@ -298,14 +306,40 @@ def filter(request,pk):
             context={'query':filter,'cmp':cmp,'sld':sld,'recomlist':recommended,'cat':cat,'category':catobj.name}                 
             return render(request,'index.html',context)       
 
+
+
+
 def logoutUser(request):
 	logout(request)
 	return redirect('index')
 
+
+
+
 def dashboard(request):
     return render(request,'admin.html')
 
+
+
+
 def viewcart(request):
+    # if request.method=='POST':
+    #     bid=request.POST['bid']
+    #     pay=request.POST['pay']      
+    #     bl=Bucketlist.objects.get(id=bid)
+    #     prod=Product.objects.get(id=bl.item.id)
+    #     total=prod.price
+    #     print(f'The pay is {pay}')
+    #     if pay == "esewa":
+    #         # if not Order.objects.filter(item=prod,user=request.user).exists():
+    #         #     Order.objects.create(item=prod,user=request.user,payment=pay,total=total)
+    #         # if Order.objects.filter(item=prod,user=request.user).exists():
+    #         #     Bucketlist.objects.filter(id=bid).delete() 
+    #         #order=Order.objects.get(user=request.user)
+    #         context = {'prod':prod.id,'bid':bid,'total':total}
+    #         print(f'The context is {context}')
+    #         return render(request,'payment.html',context)
+            
     prov=Province.objects.all()
     munic=Municipality.objects.all()
     dist=District.objects.all() 
@@ -322,6 +356,8 @@ def viewcart(request):
     return render(request,'cart.html',context)
     
 
+
+
 def addPackage(request):
     if request.user.is_authenticated:
         prod = Product.objects.filter(posted_by=request.user)
@@ -335,6 +371,9 @@ def addPackage(request):
     else:
         return redirect('/login')
 
+
+
+
 def getPackageDetails(request):
     if request.method=='POST':
         p_id=request.POST['id']
@@ -342,6 +381,9 @@ def getPackageDetails(request):
         deta=Product.objects.filter(id=p_id)        
         det = serializers.serialize('json', deta)
         return HttpResponse(det, content_type="text/json-comment-filtered")
+
+
+
 
 
 def profile(request):
@@ -377,27 +419,53 @@ def profile(request):
             return JsonResponse({'data':message})
     context={'cmp':cmp,'sld':sld,'prov':prov,'dist':dist,'muni':munic,'profile':profile}
     return render(request,'profile.html',context)
+
+
+
+
+
 def payment(request):
     if request.method=='POST':
-        id=request.POST['id']
+        bid=request.POST['id']
         total=request.POST['total']
-        pay=request.POST['pay']  
-        print(id,total,pay)      
-        bl=Bucketlist.objects.get(id=id)
+        pay=request.POST['pay']      
+        bl=Bucketlist.objects.get(id=bid)
         prod=Product.objects.get(id=bl.item.id)
-        if not Order.objects.filter(item=prod,user=request.user).exists():
-            Order.objects.create(item=prod,user=request.user,payment=pay,total=total)
-            if Order.objects.filter(item=prod,user=request.user).exists():
-                Bucketlist.objects.filter(id=id).delete()            
-                order=Order.objects.get(user=request.user)
-                if pay=='esewa':
-                    return render(request,'payment.html',{'order':order})
-                else:
-                    return redirect('index')
+        # if not Order.objects.filter(item=prod,user=request.user).exists():
+        #     Order.objects.create(item=prod,user=request.user,payment=pay,total=total)
+        # if Order.objects.filter(item=prod,user=request.user).exists():
+        #     #Bucketlist.objects.filter(id=bid).delete() 
+                   
+        #order=Order.objects.get(user=request.user)
+        context = {'prod':prod.id,'bid':bid,'total':total}
+        print (context)
+        return render(request,'payment.html',context)
+        #return JsonResponse({'context':context})
 
+    else:
+        return render(request,'cart.html')
+        
 
-
+def esewaPortal(request,pk):
+    if request.method=='POST':  
+        print(pk + 'Aayoooooo')
+        return render(request,'payment.html')
     return render(request,'payment.html')
+
+
+
+def esewaVerify(request):
+    oid = request.GET["o_id"]
+    amt = request.GET["amt"]
+    id = oid.split("_")
+    bid = id[1]
+    print(oid,amt,bid)
+    # if not Order.objects.filter(item=prod,user=request.user).exists():
+        #     Order.objects.create(item=prod,user=request.user,payment=pay,total=total)
+        # if Order.objects.filter(item=prod,user=request.user).exists():
+        #     #Bucketlist.objects.filter(id=bid).delete() 
+    return redirect('index')
+
 
 def category1(request):
     return render(request,'category1.html')
