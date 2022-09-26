@@ -105,6 +105,7 @@ class Product(models.Model):
 class Merchant(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE,null=True)
+    email=models.CharField(max_length=100,null=True)
     fullname=models.CharField(max_length=100,null=True)
     phone = models.CharField(max_length=200,null=True)
     type_of_user = models.CharField(max_length=200,null=True)
@@ -117,11 +118,11 @@ class Merchant(models.Model):
     gender = models.CharField(max_length=200,null=True)
     pan_no = models.CharField(max_length=200,null=True)
     company_name = models.CharField(max_length=200,null=True)
-    company_website = models.CharField(max_length=200,null=True)
+    company_website = models.URLField(max_length=200,null=True)
     status=models.BooleanField(default=False)
 
     def __str__(self):
-        return self.username
+        return self.fullname
 
 
 class Customer(models.Model):    
