@@ -13,10 +13,15 @@ urlpatterns = [
    path('prod_detail/<str:pk>/', views.prod_detail, name="prod_detail"),
    path('filter/<str:pk>/', views.filter, name="filter"),
    path('booking_list', views.booking_list, name="booking_list"),
+   path('getbookingdetail', views.getbookingdetail, name="getbookingdetail"),
    path('search', views.search, name="search"),
    path('addtocart', views.addtocart, name="addtocart"),
    path('viewcart', views.viewcart, name="viewcart"),
    path('merchant', views.merchant, name="merchant"),
+   path('export_excel', views.export_excel, name="export_excel"),
+   path('export_excel_package', views.export_excel_package, name="export_excel_package"),
+   path('merchprofile', views.merchprofile, name="merchprofile"),
+   path('createmerchprofile',views.createmerchprofile,name='createmerchprofile'),
    
    path('dashboard',views.dashboard,name='dashboard'),
    

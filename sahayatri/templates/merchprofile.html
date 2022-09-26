@@ -10,7 +10,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Sahayatri - Booking List</title>
+    <title>Sahayatri - Dashboard</title>
 
     <!-- Custom fonts for this template-->
     <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
@@ -20,6 +20,15 @@
 
     <!-- Custom styles for this template-->
     <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <style>
+        .btn-user {
+    margin-left: 40%;
+    width: 173px;
+    font-size: .8rem;
+    border-radius: 10rem;
+    padding: 0.75rem 1rem;
+}
+    </style>
 
 </head>
 
@@ -94,8 +103,7 @@
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="{% url 'booking_list'  %}" data-toggle="collapse" data-target="#collapsePages"
-                    aria-expanded="true" aria-controls="collapsePages">
+                <a class="nav-link collapsed" href="{% url 'booking_list' %}">
                     <i class="fas fa-fw fa-folder"></i>
                     <span>View Bookings</span>
                 </a>                
@@ -136,19 +144,7 @@
                         <i class="fa fa-bars"></i>
                     </button>
 
-                    <!-- Topbar Search -->
-                    <form
-                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                aria-label="Search" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                    <!-- Topbar Search -->                    
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
@@ -177,56 +173,7 @@
                             </div>
                         </li>
 
-                        <!-- Nav Item - Alerts -->
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-bell fa-fw"></i>
-                                <!-- Counter - Alerts -->
-                                <span class="badge badge-danger badge-counter">{{ order_count }}</span>
-                            </a>
-                            <!-- Dropdown - Alerts -->
-                            <!-- <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="alertsDropdown">
-                                <h6 class="dropdown-header">
-                                    Alerts Center
-                                </h6>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-primary">
-                                            <i class="fas fa-file-alt text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 12, 2019</div>
-                                        <span class="font-weight-bold">A new monthly report is ready to download!</span>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-success">
-                                            <i class="fas fa-donate text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 7, 2019</div>
-                                        $290.29 has been deposited into your account!
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-warning">
-                                            <i class="fas fa-exclamation-triangle text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 2, 2019</div>
-                                        Spending Alert: We've noticed unusually high spending for your account.
-                                    </div>
-                                </a>
-                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
-                            </div> -->
-                        </li>                        
+                        <!-- Nav Item - Alerts -->                                            
                         <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
@@ -240,7 +187,7 @@
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="{% url 'merchprofile' %}">
+                                <a class="dropdown-item" href="#">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
                                 </a>                                
@@ -258,58 +205,68 @@
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
-                <div class="container-fluid">
+                <div class="container">
 
-                    <!-- Page Heading -->
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">                        
-                        <a href="{% url 'export_excel' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                        class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
-                    </div>
+                    <div class="card o-hidden border-0 shadow-lg my-5">
+                        <div class="card-body p-0">
+                            <!-- Nested Row within Card Body -->
+                            <div class="row">                                
+                                <div class="col-lg-12">
+                                    <div class="p-5">
+                                        <div class="text-center">
+                                            <h1 class="h4 text-gray-900 mb-4">Update Merchant Profile</h1>
+                                        </div>
+                                        <form class="user" method="post" action="{% url 'createmerchprofile' %}" >
+                                            {% csrf_token %}
+                                            {% for m in merch %}
+                                            <div class="form-group row">
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <input type="text" class="form-control form-control-user" name="cname"
+                                                      value="{{ m.fullname }}" required placeholder="Company Name">
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <input type="text" value="{{ m.country }}" required class="form-control form-control-user" name="caddres"
+                                                        placeholder="Address">
+                                                </div>                                                
+                                            </div>                                            
+                                            <div class="form-group row">
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <input type="number" min="0" required class="form-control form-control-user"
+                                                        name="pan" value="{{ m.pan_no }}" placeholder="PAN No">
+                                                </div>
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <input type="text" value="{{ m.company_website }}" min="0" class="form-control form-control-user" name="redgno"
+                                                        placeholder="Company Web Site URL">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <input type="email" value="{{ m.email }}" required class="form-control form-control-user" name="email"
+                                                        placeholder="Email Address">
+                                                </div>
 
-                    <!-- Content Row -->                    
-                    <!-- Content Row -->
-
-                    <div class="container-fluid">
-
-                        <!-- Page Heading -->
-                        <h1 class="h3 mb-2 text-gray-800">Booking List</h1>                        
-                        <div class="card shadow mb-4">                            
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                        <thead>
-                                            <tr>
-                                                <th>S.N</th>
-                                                <th>Name</th>                                               
-                                                <th>Price</th>                                                                                              
-                                                <th>Booked By</th>                                                                                              
-                                            </tr>
-                                        </thead>  
-                                                {% for b in blist %}                                                                                                                                                    
-                                            <tr>
-                                                <td>{{ forloop.counter }}</td>
-                                                <td>{{ b.item.name  }} ( {{ b.item.days }} Days {{ b.item.nights }} Nights )</td>                                                
-                                                <td>{{ b.item.price }}</td>
-                                                <td>{{ b.user.username }}</td>
-                                                
-                                                <!-- <i class="fas fa-download fa-sm text-white-50"></i>                                                 -->
-                                                
-                                            </tr>
-                                            {% endfor %}
-                                        
-                                        </tbody>
-                                    </table>
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <input type="number" value="{{ m.phone }}" required min="0" pattern="[9][6-9]\d{8}"  class="form-control form-control-user"
+                                                        name="phone" placeholder="contact no">
+                                                </div>
+                                            </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-user btn-block">
+                                                Update Merchant Profile
+                                            </button>  
+                                            {% endfor %}                                         
+                                        </form>
+                                        <hr>                                        
+                                    </div>
                                 </div>
                             </div>
                         </div>
-    
                     </div>
-                    <!-- /.container-fluid -->
-
-                </div>
-                <!-- /.container-fluid -->
+            
+                </div>                <!-- /.container-fluid -->
 
             </div>
+    </div>
             <!-- End of Main Content -->
 
             <!-- Footer -->

@@ -24,7 +24,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import CreateUserForm
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
-from sahayatriapp.models import BudgetCategory, Bucketlist,Company, Order,Rating,Slider,TypeCategory,Product,District,Municipality,Province,Customer
+from sahayatriapp.models import BudgetCategory, Bucketlist,Company, Merchant, Order,Rating,Slider,TypeCategory,Product,District,Municipality,Province,Customer
 from sahayatriapp.models import Product
 from django.core import serializers
 from math import sqrt
@@ -231,11 +231,62 @@ def merchant(request):
 
 def booking_list(request):
     if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
-        b_list=Bucketlist.objects.filter(posted_by=request.user.id)
-        print (b_list.values_list)
+        b_list=Bucketlist.objects.filter(posted_by=request.user.id)        
         context={'blist':b_list}
         return render(request,'bookinglist.html',context)
 
+def export_excel(request):
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
+        b_list=Bucketlist.objects.filter(posted_by=request.user.id)                
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="Booking List.csv"'        
+        writer = csv.writer(response)
+        writer.writerow(['Booking List'])       
+        writer.writerow(['Name','Price','Booked By'])
+        for b in b_list:
+            writer.writerow([b.item.name,b.item.price,b.user.username])
+
+    return response
+
+def export_excel_package(request):
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
+        b_list=Product.objects.filter(posted_by=request.user)                
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="Package_List.csv"'        
+        writer = csv.writer(response)
+        writer.writerow(['Package List'])       
+        writer.writerow(['Name','Price','Duration','Valid Date'])
+        for b in b_list:
+            writer.writerow([b.name,b.price,str(b.days) +' Days '+ str(b.nights)+' Nights',b.valid_date])
+
+    return response
+
+def merchprofile(request):
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
+        if not Merchant.objects.filter(user=request.user).exists():
+            context={}
+        else:
+            merch=Merchant.objects.filter(user=request.user)
+            print(merch)
+            context={'merch':merch}
+        return render(request,'merchprofile.html',context)
+def createmerchprofile(request):
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
+        if request.method=='POST':
+            fullname=request.POST['cname']
+            address=request.POST['caddres']
+            pan=request.POST['pan']
+            redgno=request.POST['redgno']
+            email=request.POST['email']
+            phone=request.POST['phone']
+            if not Merchant.objects.filter(user=request.user).exists():               
+                Merchant.objects.create(user=request.user,fullname=fullname,country=address,pan_no=pan,email=email,phone=phone,company_website=redgno)
+                merch=Merchant.objects.filter(user=request.user)                
+                return render(request,'merchprofile.html',{'merch':merch})
+            else:
+                Merchant.objects.filter(user=request.user).update(user=request.user,fullname=fullname,country=address,pan_no=pan,email=email,phone=phone,company_website=redgno)
+                merch=Merchant.objects.filter(user=request.user)
+                return render(request,'merchprofile.html',{'merch':merch})
 
 def addtocart(request):
     if request.method=='POST':
@@ -500,6 +551,13 @@ def GetBudgetCategoryList(request):
     #data=serializers.serialize('json',catlist)
     return JsonResponse({'catlist': list(catlist.values())})
 
+def getbookingdetail(request):
+    if request.method=='POST':
+        bid=request.POST['bid']
+        b_list=Bucketlist.objects.filter(id=bid)
+        print(b_list)
+        det = serializers.serialize('json', b_list)
+        return HttpResponse(det, content_type="text/json-comment-filtered")
 
 def GetDetail(request):
     if request.method=='POST':
