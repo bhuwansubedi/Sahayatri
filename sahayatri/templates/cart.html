@@ -48,7 +48,7 @@
             <div class="col-lg-10 col-md-9 col-sm-8">
                 <nav id="main-menu" class="ml-auto">
                     <ul>
-                        <li><a href="#home">Home</a></li>
+                        <li><a href="{% url 'index' %}">Home</a></li>
                         {% if request.user.is_authenticated %}
                         <li><a class="nav-link text-black font-weight-bold" href="{% url 'logout' %}">Logout</a>									
                         <li><a class="nav-link text-black font-weight-bold" href="#"><span>
@@ -225,7 +225,7 @@
                 <label>Order Number:</label>
                 <input id="pid" name="pid">
             </div>
-            <input value="http://http://127.0.0.1:8000/esewa-verify" type="hidden" name="su">
+            <input value="http://127.0.0.1:8000/esewa-verify" type="hidden" name="su">
             <input value="http://merchant.com.np/page/esewa_payment_failed?q=fu" type="hidden" name="fu">
             <button type="submit" id="esewaSubmit">Submit</button>
             </form>

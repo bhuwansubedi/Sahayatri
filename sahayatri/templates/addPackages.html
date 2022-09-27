@@ -294,18 +294,18 @@
                   "X-CSRFToken": "{{csrf_token}}"
                 },
             success:function(data){
-                debugger;
                 $('#pname').val(data[0].fields.name);
                 $('#price').val(data[0].fields.price);
                 $('#desc').val(data[0].fields.description);
 				$('#nights').val(data[0].fields.nights);
 				$('#days').val(data[0].fields.days);
 				$('#packageType').val(data[0].fields.category).change();
+				$('#datetime').val(data[0].fields.valid_date);
 				$('#Discount').val(data[0].fields.discount);
-				$('#inclusion').val(data[0].fields.inclusions);
-				$('#exclusion').val(data[0].fields.exclusions);
-				$('#overview').val(data[0].fields.overview);
-				$('#itnerary').val(data[0].fields.Itnerary);
+				$('#inclusion').summernote('code',data[0].fields.inclusions);
+				$('#exclusion').summernote('code',data[0].fields.exclusions);
+				$('#overview').summernote('code',data[0].fields.overview);
+				$('#itnerary').summernote('code',data[0].fields.Itnerary);
             },
             error:function(){               
                 toastr.error("Unable to get detail!","Error",options);

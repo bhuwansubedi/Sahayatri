@@ -448,22 +448,29 @@ def payment(request):
 
 def esewaPortal(request,pk):
     if request.method=='POST':  
-        print(pk + 'Aayoooooo')
         return render(request,'payment.html')
     return render(request,'payment.html')
 
 
 
 def esewaVerify(request):
-    oid = request.GET["o_id"]
-    amt = request.GET["amt"]
+    
+    oid = request.GET.get("oid")
+    total = request.GET.get("amt")
+    refId = request.GET.get("refId")
+    pay='esewa'
+    print(oid,total,refId)
     id = oid.split("_")
     bid = id[1]
-    print(oid,amt,bid)
-    # if not Order.objects.filter(item=prod,user=request.user).exists():
-        #     Order.objects.create(item=prod,user=request.user,payment=pay,total=total)
-        # if Order.objects.filter(item=prod,user=request.user).exists():
-        #     #Bucketlist.objects.filter(id=bid).delete() 
+    bl=Bucketlist.objects.get(id=bid)
+    prod=Product.objects.get(id=bl.item.id)
+    postedBy=Product.objects.get(id=bl.item.id).posted_by
+    print(postedBy)
+
+    if not Order.objects.filter(item=prod,user=request.user).exists():
+            Order.objects.create(item=prod,user=request.user,payment=pay,total=total,refId=refId,posted_by=postedBy)
+    if Order.objects.filter(item=prod,user=request.user).exists():
+        Bucketlist.objects.filter(id=bid).delete() 
     return redirect('index')
 
 
