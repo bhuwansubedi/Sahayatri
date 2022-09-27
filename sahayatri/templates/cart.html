@@ -166,9 +166,12 @@
                       </tr>
                     </thead>
                     <tbody>
+                <form method="POST" action="{% url 'saveorder_cash' %}">
+                    {% csrf_token %}
                     {% for b in blist %}                    
                       <tr class="trow">   
-                        <input id="bid" name="bid" value="{{ b.id }}" hidden></input>                     
+                        <input id="bid" name="bid" value="{{ b.id }}" hidden></input>
+                        <input id="prodid" name="prodid" value="{{ b.item.id }}" hidden></input>                     
                         <th scope="row">{{ forloop.counter }}</th>
                         <td>{{ b.item.name }}</td>
                         <td>{{ b.item.price }}</td>
@@ -179,20 +182,24 @@
                   </table>
                  
                   <p class="port-title">Total: NPR {{ total }}</p>
-                  <input value="{{total}}" id="price" hidden>
+                  <input name="price" value="{{ total }}" id="price" hidden>
                   <div class="form-group col-md-6">
                     <label>Payment Option:</label>
                     <select class="form-control1" id="pay" name="pay">
                         <option value="0" selected>Choose Payment Method</option>
                         
-                        <option value="cash">Cash</option>
-                        <option value="esewa">e-Sewa</option>                        
+                        <option value="esewa">e-Sewa</option>
+                        <option value="Khalti">Khalti</option>
+                                                
                         
                     </select>
                 </div>
                     <div class="col-md-12 text-left">
                         <button type="button" id="modalBtn" value="Send message" data-toggle="modal" data-target=".bd-example-modal-lg" class="btn-home-border" title="Checkout">Checkout</button>
                     </div>
+                    <!-- <div class="col-md-12 text-left">
+                        <button class="btn-home-border" type="submit" id="saveOrder" >Save Order</button>
+                    </div> -->
                  </form>
                 	
             </div><!-- END Col -->
@@ -273,6 +280,7 @@
     // });
 
     $('#btnSaveProfile1').hide();
+    $('#saveOrder').hide();
     $('#pay').select2();
 
     $('#modalBtn').on('click',function(){
@@ -284,9 +292,11 @@
     $('#pay').on("select2:close", function (e) {
         if($('#pay').val()=='esewa'){
             $('#modalBtn').show();
+            $('#saveOrder').hide();
         }
         else{
             $('#modalBtn').hide();
+            $('#saveOrder').show();
         }
     });
 

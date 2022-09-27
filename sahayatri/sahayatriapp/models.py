@@ -195,13 +195,16 @@ class Bucketlist(models.Model):
     
 class Order(models.Model):
     item=models.ForeignKey(Product,on_delete=models.CASCADE)
-    total=models.CharField(max_length=100,null=True)
+    total=models.PositiveIntegerField(null=True)
     user=models.ForeignKey(User,on_delete=models.CASCADE)
-    date_created = models.DateTimeField(auto_now_add=True,null=True)
-    refId = models.CharField(max_length=250,null=True)
+    date_created = models.DateTimeField(auto_now_add=True,null=True)       
     posted_by = models.CharField(max_length=100,null=True)
     payment=models.CharField(max_length=100,null=True)
+    refId=models.CharField(max_length=250,null=True)
 
+
+class TestClass(models.Model):
+    testname=models.CharField(max_length=100,null=True)
     
 
 

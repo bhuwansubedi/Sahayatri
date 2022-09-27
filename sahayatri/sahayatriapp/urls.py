@@ -22,11 +22,14 @@ urlpatterns = [
    path('merchant', views.merchant, name="merchant"),
    path('export_excel', views.export_excel, name="export_excel"),
    path('export_excel_package', views.export_excel_package, name="export_excel_package"),
+   path('export_excel_order', views.export_excel_order, name="export_excel_order"),
    path('merchprofile', views.merchprofile, name="merchprofile"),
    path('createmerchprofile',views.createmerchprofile,name='createmerchprofile'),
    
    path('dashboard',views.dashboard,name='dashboard'),
-   
+   path('saveorder_cash',views.savecashorder,name='saveorder_cash'),
+   path('vieworderlist',views.vieworderlist,name='vieworderlist'),
+
    path('payment/',views.payment,name='payment'),
    path('esewaPortal/<str:pk>/',views.esewaPortal,name="esewaPortal"),
 

@@ -220,11 +220,12 @@ def merchant(request):
         avg_rating = round(rtaval[0],2)
        # print(prod_list.avg_rating)        
         prod_count=prod_list.count()   
-        order_list=Order.objects.filter(user=request.user)
+        order_list=Order.objects.filter(posted_by=request.user)
+        print(order_list)
         order_count=order_list.count()        
         total_order_value=0
         for t in order_list:
-            total_order_value=total_order_value + t.total                
+            total_order_value= total_order_value + int(t.total)              
         context={'blist':blist,'bcount':bcount,'prod_list':prod_list,'prod_count':prod_count,'order_list':order_list,
         'order_count':order_count,'tov':total_order_value,'avg_rating':avg_rating}
         return render(request,'admin.html',context)
@@ -443,7 +444,41 @@ def viewcart(request):
     context={'cmp':cmp,'sld':sld,'prov':prov,'dist':dist,'muni':munic,'blist':blist,'profile':profile,'total':tot,'count':count}
     return render(request,'cart.html',context)
     
+def savecashorder(request):
+    if request.user.is_authenticated:
+        if request.method=='POST':
+            bid=request.POST['bid']
+            total=request.POST['price']
+            pay=request.POST['pay']
+            print(bid,total,pay)
+            prod=Product.objects.filter(id=bid)
 
+            if not Order.objects.filter(user=request.user,item=prod).exists():
+                Order.objects.create(user=request.user,item=prod,payment=pay,total=total)
+            else:
+                Order.objects.filter(user=request.user,item=prod).update(user=request.user,item=prod,payment=pay,total=total)
+            return redirect('viewcart')
+
+def vieworderlist(request):
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
+        b_list=Order.objects.filter(posted_by=request.user)  
+        print(b_list)      
+        context={'blist':b_list}
+        return render(request,'orderlist.html',context)
+
+def export_excel_order(request):
+    if request.user.is_authenticated and request.user.is_staff and request.user.username!='superadmin':
+        b_list=Order.objects.filter(posted_by=request.user)   
+        print(b_list)             
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="Order List.csv"'        
+        writer = csv.writer(response)
+        writer.writerow(['Order List'])       
+        writer.writerow(['Name','Price','Payment','Reference No','Ordered By'])
+        for b in b_list:
+            writer.writerow([b.item.name,b.item.price,b.payment,b.refId,b.user.username])
+
+    return response
 
 
 def addPackage(request):
@@ -469,7 +504,8 @@ def getPackageDetails(request):
     if request.method=='POST':
         p_id=request.POST['id']
         print(p_id)
-        deta=Product.objects.filter(id=p_id)        
+        deta=Product.objects.filter(id=p_id)  
+
         det = serializers.serialize('json', deta)
         return HttpResponse(det, content_type="text/json-comment-filtered")
 
@@ -588,7 +624,9 @@ def insertcategory(request):
         return JsonResponse({'mess':mess})
     return redirect('category1')
 def InsertPackage(request):  
-    if request.method=='POST':       
+    if request.method=='POST':   
+        pid=request.POST['pid'] 
+        print(pid)   
         action=request.POST['action']
         img1=request.FILES.get('img1')#['fileList']
         img2=request.FILES.get('img2')#['fileList']
@@ -618,10 +656,14 @@ def InsertPackage(request):
         muni=Municipality.objects.get(id=muni)
         cat=TypeCategory.objects.get(id=catType)
         bud=BudgetCategory.objects.get(id=packageType)
-        if(action == '1'):
+        if(action == '1'):            
            Product.objects.create(name=pname,price=price,category=cat,budget=bud,image=thumbImg,description=desc,posted_by=author,inclusions=inclusions,exclusions=exclusions,Itnerary=itner,mapurl=location,days=days,nights=nights,province=prov,district=dist,muni=muni,valid_date=vdate,image1=img1,image2=img2,image3=img3,image4=img4,overview=overview)
            status='Success'       
            return JsonResponse({'status':status})
+        else:
+            Product.objects.filter(id=pid).update(name=pname,price=price,category=cat,budget=bud,image=thumbImg,description=desc,posted_by=author,inclusions=inclusions,exclusions=exclusions,Itnerary=itner,mapurl=location,days=days,nights=nights,province=prov,district=dist,muni=muni,valid_date=vdate,image1=img1,image2=img2,image3=img3,image4=img4,overview=overview)
+            status='Success'       
+            return JsonResponse({'status':status})
     
     return redirect('addPackage')
     

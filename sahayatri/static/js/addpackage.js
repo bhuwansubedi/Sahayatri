@@ -275,6 +275,7 @@ function InsertPackage(act){
   else if($('#catType').val()==0|| $('#catType').val()==null){
     toastr.error("Cannot leave null category field","Error");
   }else{    
+      var pid=$('#id').val()==null?'0':$('#id').val();
       var action=act;      
       var pname=$('#pname').val();
       var price=$('#price').val();
@@ -302,6 +303,7 @@ function InsertPackage(act){
       data.append("img4",$("input[id^='imgInp']")[0].files[3]);      
       data.append("thumbImg",$("input[id^='thumbImg']")[0].files[0]);
       data.append("pname",pname);
+      data.append("pid",pid);
       data.append("price",price);
       data.append("desc",desc);
       data.append("nights",nights);
