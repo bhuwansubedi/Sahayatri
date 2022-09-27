@@ -48,7 +48,7 @@
             <div class="col-lg-10 col-md-9 col-sm-8">
                 <nav id="main-menu" class="ml-auto">
                     <ul>
-                        <li><a href="#home">Home</a></li>
+                        <li><a href="{% url 'index' %}">Home</a></li>
                         {% if request.user.is_authenticated %}
                         <li><a class="nav-link text-black font-weight-bold" href="{% url 'logout' %}">Logout</a>									
                         <li><a class="nav-link text-black font-weight-bold" href="#"><span>
@@ -86,7 +86,7 @@
         </div>					
         <div class="row align-items-center">					
             <div class="col-lg-5 col-md-5  col-sm-12 col-xs-12">                                
-                <form class="contact-form center ">
+                <form class="contact-form center " method="post">
                     {% csrf_token %}
                     <div class="row">
                         <div class="form-group col-md-6">
@@ -152,8 +152,7 @@
                             <button type="button" id="btnSaveProfile" onclick="InsertProfile();" value="Send message" name="submit" class="btn-home-border" title="Update User Profile!">Create Profile</button>
                         </div>
                         {% endif %}                        
-                    </div>
-                </form>							
+                    </div>						
             </div>
             <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
 
@@ -169,7 +168,7 @@
                     <tbody>
                     {% for b in blist %}                    
                       <tr class="trow">   
-                        <input id="bid" hidden>{{ b.id }}</input>                     
+                        <input id="bid" name="bid" value="{{ b.id }}" hidden></input>                     
                         <th scope="row">{{ forloop.counter }}</th>
                         <td>{{ b.item.name }}</td>
                         <td>{{ b.item.price }}</td>
@@ -180,19 +179,21 @@
                   </table>
                  
                   <p class="port-title">Total: NPR {{ total }}</p>
+                  <input value="{{total}}" id="price" hidden>
                   <div class="form-group col-md-6">
-                    <select class="form-control1" id="pay">
+                    <label>Payment Option:</label>
+                    <select class="form-control1" id="pay" name="pay">
                         <option value="0" selected>Choose Payment Method</option>
                         
-                        <option value="1">Cash</option>
+                        <option value="cash">Cash</option>
                         <option value="esewa">e-Sewa</option>                        
                         
                     </select>
-                </div>      
-                  <div class="col-md-12 text-left">
-                    <button type="button" id="btnCheckout" onclick="" value="Send message" name="submit" class="btn-home-border" title="Checkout">Checkout</button>
                 </div>
-               
+                    <div class="col-md-12 text-left">
+                        <button type="button" id="modalBtn" value="Send message" data-toggle="modal" data-target=".bd-example-modal-lg" class="btn-home-border" title="Checkout">Checkout</button>
+                    </div>
+                 </form>
                 	
             </div><!-- END Col -->
         </div><!-- END ROW -->
@@ -200,74 +201,129 @@
         </div><!-- END ROW -->
     </div><!-- END CONTAINER -->	
 </section>
+
+
+<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <form action="https://uat.esewa.com.np/epay/main" method="POST">
+            <h4>Please confirm the Price before being redirected to the payment portal.</h4>
+            <div>
+                <label>Amount:</label>
+                <input id="tAmt" name="tAmt">
+            </div>
+            <div>
+                <label>Total Amount:</label>
+                <input id="amt" name="amt">
+            </div>
+            
+            <input value="0" name="txAmt" type="hidden">
+            <input value="0" name="psc" type="hidden">
+            <input value="0" name="pdc" type="hidden">
+            <input value="EPAYTEST" name="scd" type="hidden">
+            <div>
+                <label>Order Number:</label>
+                <input id="pid" name="pid">
+            </div>
+            <input value="http://127.0.0.1:8000/esewa-verify" type="hidden" name="su">
+            <input value="http://merchant.com.np/page/esewa_payment_failed?q=fu" type="hidden" name="fu">
+            <button type="submit" id="esewaSubmit">Submit</button>
+            </form>
+    </div>
+  </div>
+</div>
 <!-- END Contact Us -->
 <script>
-    $('#btnCheckout').on('click',function(){
-        if("{{ count }}" !=1){
-            toastr.warning("Plese buy one package at a time!");            
+    // $('#btnCheckout').on('click',function(){
+    //     if("{{ count }}" !=1){
+    //         toastr.warning("Please buy one package at a time!");            
 
-        }
-        else if($('#pay').val()==0){
-            toastr.warning("Please select a payment method!");
+    //     }
+    //     else if($('#pay').val()==0){
+    //         toastr.warning("Please select a payment method!");
+    //     }
+    //     else{
+    //         var id=$('#bid').val();
+    //         var url="{% url 'payment' %}"
+    //         var total="{{ total }}"
+    //         var pay=$('#pay').val();
+    //         var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    //         debugger;
+    //         $.ajax({
+    //             url:url,
+    //             method:"POST",
+    //             dataType:"json",
+    //             data:{id:id,total:total,pay:pay},
+    //             headers: {
+    //             "X-CSRFToken": csrftoken
+    //             },
+    //             success:function(data){
+    //             toastr.success("Redirecting to Esewa Page!");
+    //             debugger;
+    //             var prod = data.context.prod;
+    //             var bid = data.context.bid;
+    //             var total = data.context.total;
+                
+    //             },
+    //             error:function(){
+    //             toastr.error("Error!","Error in booking Package!");
+    //             }
+    //         });
+    //     }
+    // });
+
+    $('#btnSaveProfile1').hide();
+    $('#pay').select2();
+
+    $('#modalBtn').on('click',function(){
+        $('#tAmt').val($('#price').val());
+        $('#amt').val($('#price').val());
+        $('#pid').val("order_"+$('#bid').val());
+    });
+
+    $('#pay').on("select2:close", function (e) {
+        if($('#pay').val()=='esewa'){
+            $('#modalBtn').show();
         }
         else{
-            var id=$('#bid').val();
-            var url="{% url 'payment' %}"
-            var total="{{ total }}"
-            var pay=$('#pay').val();
-            var csrftoken = $("[name=csrfmiddlewaretoken]").val();
-            debugger;
-            $.ajax({
-                url:url,
-                method:"POST",
-                dataType:"json",
-                data:{id:id,total:total,pay:pay},
-                headers: {
-                "X-CSRFToken": csrftoken
-                },
-                success:function(data){
-                toastr.success("Package Booked Successfully!");
-                },
-                error:function(){
-                toastr.error("Error!","District not found!");
-                }
-            });
+            $('#modalBtn').hide();
         }
     });
-    $('#btnSaveProfile1').hide();
+
     if($('#check').val()=='update'){
         var username="{{ profile.fullname }}"
         var muni="{{ profile.muni.id }}"
-    var email="{{ profile.email }}"
-    var mobile="{{ profile.phone }}"
-    var prov="{{ profile.province.id }}"
-    var dist="{{ profile.district.id }}"
-    var nation="{{ profile.country }}"
-    var gender="{{ profile.gender }}"
-    $('#email').val(email);
-    $('#name').val(username);
-    $('#mobile').val(mobile);
-    $('#name').focus();
-    $('#province').val(prov).change();
-    $('#muni').val(muni).change(); 
-    $('#district').val(dist).change();
-    $('#gender').val(gender).change();
-    $('#country').val(nation);
-    $('.form-control').prop('disabled',true)
+        var email="{{ profile.email }}"
+        var mobile="{{ profile.phone }}"
+        var prov="{{ profile.province.id }}"
+        var dist="{{ profile.district.id }}"
+        var nation="{{ profile.country }}"
+        var gender="{{ profile.gender }}"
+        $('#email').val(email);
+        $('#name').val(username);
+        $('#mobile').val(mobile);
+        $('#name').focus();
+        $('#province').val(prov).change();
+        $('#muni').val(muni).change(); 
+        $('#district').val(dist).change();
+        $('#gender').val(gender).change();
+        $('#country').val(nation);
+        $('.form-control').prop('disabled',true)
     }
 
-else{
-    $('#btnCheckout').hide();
-    var pemail="{{ request.user.email }}"
-    $('#email').val(pemail);
-    $('#name').val("{{ request.user.username }}");
-    
-}
+    else
+    {
+        $('#btnCheckout').hide();
+        var pemail="{{ request.user.email }}"
+        $('#email').val(pemail);
+        $('#name').val("{{ request.user.username }}");
+    }
 
     $('#name').focus();
     $('#province').select2();
     $('#muni').select2(); 
-    $('#district').select2();     
+    $('#district').select2();  
+
 $('#province').on('select2:close', function () {
   var prov=$('#province').val();
   url=$('#url').data('url'); 

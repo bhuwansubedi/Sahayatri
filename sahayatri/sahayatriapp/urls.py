@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path,include
 from sahayatriapp import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
    path('', views.index, name='index'),
@@ -16,7 +17,8 @@ urlpatterns = [
    path('getbookingdetail', views.getbookingdetail, name="getbookingdetail"),
    path('search', views.search, name="search"),
    path('addtocart', views.addtocart, name="addtocart"),
-   path('viewcart', views.viewcart, name="viewcart"),
+   path('viewcart/', views.viewcart, name="viewcart"),
+   path('getPackageDetails/',views.getPackageDetails,name='getPackageDetails'),
    path('merchant', views.merchant, name="merchant"),
    path('export_excel', views.export_excel, name="export_excel"),
    path('export_excel_package', views.export_excel_package, name="export_excel_package"),
@@ -25,7 +27,10 @@ urlpatterns = [
    
    path('dashboard',views.dashboard,name='dashboard'),
    
-   path('payment',views.payment,name='payment'),
+   path('payment/',views.payment,name='payment'),
+   path('esewaPortal/<str:pk>/',views.esewaPortal,name="esewaPortal"),
+
+   path('esewa-verify',views.esewaVerify,name="esewaVerify"),
    
    path('category1',views.category1,name='category1'),
    path('category2',views.category2,name='category2'),
@@ -44,4 +49,23 @@ urlpatterns = [
    path('getcategorytype/',views.GetCategoryType,name='getcategorytype'),
    path('categorytypedetail/',views.GetCategoryTypeDetail,name='categorytypedetail'),
    path('deletecategorytype/',views.DeleteCategoryType,name='deletecategorytype'),
+
+
+   #Password Reset URLS...
+
+   path('reset_password/',
+     auth_views.PasswordResetView.as_view(template_name="password_reset.html"),
+     name="reset_password"),
+
+   path('reset_password_sent/', 
+      auth_views.PasswordResetDoneView.as_view(template_name="password_reset_sent.html"), 
+      name="password_reset_done"),
+
+   path('reset/<uidb64>/<token>/',
+     auth_views.PasswordResetConfirmView.as_view(template_name="password_reset_form.html"), 
+     name="password_reset_confirm"),
+
+   path('reset_password_complete/', 
+      auth_views.PasswordResetCompleteView.as_view(template_name="password_reset_done.html"), 
+      name="password_reset_complete"),
 ]
